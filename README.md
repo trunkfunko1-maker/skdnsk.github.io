@@ -8,5 +8,4 @@
 
 <img src="https://i.ibb.co/jPZs32yg/Image-1772892686580-658.jpg" alt="Image 1772892686580 658" border="0">
 
-<img src="https://i.ibb.co/cKDtpxq9/retouch-2026050400332589.jpg" alt="retouch 2026050400332589" border="0">
-真逗。
+<a href="https://ibb.co/Gfck1FmD"><img src="https://i.ibb.co/cKDtpxq9/retouch-2026050400332589.jpg" alt="retouch 2026050400332589" border="0"></a>
