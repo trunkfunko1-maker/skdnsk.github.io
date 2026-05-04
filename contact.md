@@ -5,14 +5,14 @@ title: 联系我
 
 # 联系我
 
-如果您有任何想法或建议，请通过下方表单告知我。发送后您将留在本页面。
+如果您有任何想法或建议，请通过下方页面告知我。
 
 <!-- 表单部分 -->
 <div class="contact-container" style="max-width: 600px; margin-top: 20px;">
   <form id="contact-form" action="https://formspree.io/f/xzdoeald" method="POST">
     
   <div style="margin-bottom: 15px;">
-      <label>您的联系方式 (邮箱或名称):</label><br>
+      <label>您的邮箱:</label><br>
       <!-- 使用 type="text" 避开浏览器邮箱格式检测，name="contact" 避开服务商检测 -->
       <input type="text" name="contact" required style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;">
     </div>
