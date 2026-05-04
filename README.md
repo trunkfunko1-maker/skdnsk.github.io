@@ -43,3 +43,11 @@
 
 <a href="22.html"> <button type="button">神秘图片</button> </a>
 
+
+<!-- _includes/footer.html -->
+<footer style="background: #24292e; color: white; text-align: center; padding: 20px; margin-top: 50px;">
+    <p>© 2026 川大附中天堂网 |</p>
+    <p>
+     <a href="https://ti.qq.com/open_qq/index2.html?url=mqqapi%3a%2f%2fuserprofile%2ffriend_profile_card%3fsrc_type%3dweb%26version%3d1.0%26source%3d2%26uin%3d1975886713" style="color: #58a6ff;">联系我的QQ</a>
+    </p>
+</footer>
