@@ -1,3 +1,10 @@
-.navbar { background-color: #333; color: white; padding: 1rem; }
-.navbar ul { margin: 0; padding: 0; list-style: none; display: flex; justify-content: center; }
-.navbar a { text-decoration: none; color: white; padding: 0 15px; }
+header {
+    position: fixed; /* 固定在顶部 */
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
