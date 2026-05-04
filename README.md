@@ -17,3 +17,9 @@
 
 
 <a href="22.html"> <button type="button">神秘图片</button> </a>
+
+
+<video width="100%" controls>
+    <source src="SVID_20231018_231912_1.mp4" type="video/mp4">
+    您的浏览器不支持 HTML5 video 标签。
+</video>
