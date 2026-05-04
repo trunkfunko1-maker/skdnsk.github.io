@@ -3,7 +3,8 @@ layout: none
 ---
 [
   {% for page in site.pages %}
-    {% if page.path contains "docs/" %}
+    {% if page.path contains "skdnsk.abrdns.com
+/25.md" %}
     {
       "title" : "{{ page.title | escape }}",
       "url"   : "{{ page.url | relative_url }}"
