@@ -1,3 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的网页</title>
+    <!-- 引用外部样式表 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="#">首页</a>
+        <a href="#">项目</a>
+        <a href="#">关于</a>
+    </div>
+    <h1>欢迎来到我的 GitHub Page</h1>
+</body>
+</html>
 
 
 # 川大附中 天堂网
