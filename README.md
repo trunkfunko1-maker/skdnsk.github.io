@@ -8,7 +8,7 @@
 <body>
     <div class="navbar">
         <a href="#">首页</a>
-        <a href="#">项目</a>
+        <a href="contact.html">联系</a>
         <a href="23.html">关于</a>
         <a href="22.html">怪物鸡吧</a>
     </div>
