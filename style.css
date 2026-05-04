@@ -1,0 +1,3 @@
+.navbar { background-color: #333; color: white; padding: 1rem; }
+.navbar ul { margin: 0; padding: 0; list-style: none; display: flex; justify-content: center; }
+.navbar a { text-decoration: none; color: white; padding: 0 15px; }
