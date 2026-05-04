@@ -56,5 +56,9 @@
     <p>
      <a href="https://ti.qq.com/open_qq/index2.html?url=mqqapi%3a%2f%2fuserprofile%2ffriend_profile_card%3fsrc_type%3dweb%26version%3d1.0%26source%3d2%26uin%3d1975886713" style="color: #58a6ff;">联系我的QQ</a>
     </p>
+    <p>
     <a href="mailto:djkenfisao@proton.me" style="color: #58a6ff;">发送投稿</a>
+    </p>
+    <p>
+        <a href="contact.md" style="color: #58a6ff;">联系我</a>
 </footer>
