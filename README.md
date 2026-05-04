@@ -1,3 +1,5 @@
+# 川大附中 天堂网
+
 <nav class="navbar">
     <ul>
         <li><a href="index.html">首页</a></li>
@@ -6,8 +8,6 @@
     </ul>
 </nav>
 
-
-# 川大附中 天堂网
 下面展示由四川大学附属中学**王茂纲**老师出演的*高雅写真*
 
 <div align="center"><img src="https://i.ibb.co/zV81w5zJ/retouch-2026050400332589-edit-105730915884908.jpg" alt="retouch 2026050400332589 edit 105730915884908" border="0" width="70%"><div>
