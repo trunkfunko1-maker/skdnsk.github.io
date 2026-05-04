@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -12,7 +11,6 @@
         <a href="#">项目</a>
         <a href="#">关于</a>
     </div>
-    <h1>欢迎来到我的 GitHub Page</h1>
 </body>
 </html>
 
