@@ -1,20 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>我的网页</title>
-    <!-- 引用外部样式表 -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="navbar">
-        <a href="#">首页</a>
-        <a href="#">项目</a>
-        <a href="#">关于</a>
-    </div>
-    <h1>欢迎来到我的 GitHub Page</h1>
-</body>
-</html>
+/* 整个页面的外边距清零，防止顶栏和边缘有缝隙 */
+body {
+    margin: 0;
+}
+
+/* 随页面滚动的顶栏 */
+.navbar {
+    position: relative; /* 或者 static */
+    background-color: #24292e; /* 经典的 GitHub 深色 */
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+}
+
+/* 给主体内容加点高度，方便测试滚动效果 */
+.content {
+    height: 2000px;
+    padding: 20px;
+}
+
 
 # 川大附中 天堂网
 
