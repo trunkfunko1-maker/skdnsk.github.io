@@ -1,3 +1,12 @@
+<nav class="navbar">
+    <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="about.html">关于</a></li>
+        <li><a href="projects.html">项目</a></li>
+    </ul>
+</nav>
+
+
 # 川大附中 天堂网
 下面展示由四川大学附属中学**王茂纲**老师出演的*高雅写真*
 
