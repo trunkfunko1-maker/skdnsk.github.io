@@ -60,6 +60,6 @@
     <a href="mailto:djkenfisao@proton.me" style="color: #58a6ff;">发送投稿</a>
     </p>
     <p>
-        <a href="contact.md" style="color: #58a6ff;">联系我</a>
+        <a href="contact.html" style="color: #58a6ff;">联系我</a>
     </p>
 </footer>
