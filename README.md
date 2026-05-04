@@ -9,7 +9,7 @@
     <div class="navbar">
         <a href="#">首页</a>
         <a href="#">项目</a>
-        <a href="#">关于</a>
+        <a href="23.md">关于</a>
     </div>
 </body>
 </html>
