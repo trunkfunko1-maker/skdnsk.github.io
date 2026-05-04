@@ -1,9 +1,3 @@
----
-layout: default
-title: 首页
----
-
-
 <html>
 <head>
     <meta charset="UTF-8">
