@@ -1,28 +1,3 @@
-/* 整个页面的外边距清零，防止顶栏和边缘有缝隙 */
-body {
-    margin: 0;
-}
-
-/* 随页面滚动的顶栏 */
-.navbar {
-    position: relative; /* 或者 static */
-    background-color: #24292e; /* 经典的 GitHub 深色 */
-    color: white;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-around;
-}
-
-.navbar a {
-    color: white;
-    text-decoration: none;
-}
-
-/* 给主体内容加点高度，方便测试滚动效果 */
-.content {
-    height: 2000px;
-    padding: 20px;
-}
 
 
 # 川大附中 天堂网
