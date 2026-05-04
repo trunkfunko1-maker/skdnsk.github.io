@@ -15,3 +15,5 @@
 
 <div align="center"><img src="https://i.ibb.co/jPZs32yg/Image-1772892686580-658.jpg" alt="Image 1772892686580 658" border="0" width="70%"><div>
 
+
+<a href="11.html"> <button type="button">前往页面 2</button> </a>
