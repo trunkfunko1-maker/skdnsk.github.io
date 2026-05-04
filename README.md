@@ -14,7 +14,7 @@
     </div>
     <div class="navbar">
         <a href="22.html">怪物鸡吧</a>
-        <a href="22.html">怪物鸡吧</a>
+        <a href="22.html">异闻录</a>
         <a href="22.html">怪物鸡吧</a>
     </div>
 </body>
