@@ -1,14 +1,23 @@
 # 川大附中 天堂网
 
-<header>
-    <div class="logo">我的网站</div>
-    <nav>
-        <ul>
-            <li><a href="index.html">首页</a></li>
-            <li><a href="about.html">关于</a></li>
-        </ul>
-    </nav>
-</header>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>我的网页</title>
+    <!-- 引用外部样式表 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="#">首页</a>
+        <a href="#">项目</a>
+        <a href="#">关于</a>
+    </div>
+    <h1>欢迎来到我的 GitHub Page</h1>
+</body>
+</html>
+
 
 
 下面展示由四川大学附属中学**王茂纲**老师出演的*高雅写真*
