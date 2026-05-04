@@ -24,6 +24,9 @@
 # 川大附中 天堂网
 本站始终致力于维护四川大学附属中学师生的心理健康安全，努力营造良好的校园氛围。
 
+<div style="text-align: center;">
+<img src="https://i.ibb.co/HpB1fJf4/retouch-2026050423533556.jpg" alt="retouch 2026050423533556" border="0" width="30%">
+</div>
 
 <!-- _includes/footer.html -->
 <footer style="background: #24292e; color: white; text-align: center; padding: 20px; margin-top: 50px;">
