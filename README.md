@@ -28,6 +28,10 @@
 <img src="https://i.ibb.co/HpB1fJf4/retouch-2026050423533556.jpg" alt="retouch 2026050423533556" border="0" width="31%">
 </div>
 
+<div style="text-align: center;">
+<img src="https://i.ibb.co/YFfvByLR/retouch-2026050500192841-edit-166799889432881.jpg" alt="retouch 2026050500192841 edit 166799889432881" border="0" width="31%">
+</div>
+
 <!-- _includes/footer.html -->
 <footer style="background: #24292e; color: white; text-align: center; padding: 20px; margin-top: 50px;">
     <p>© 2026 川大附中天堂网 </p>
