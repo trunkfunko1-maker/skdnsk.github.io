@@ -9,7 +9,6 @@ body {
     padding: 15px;
     color: white;
     text-align: center;
-    position: sticky; /* 滚动时粘在顶部 */
     top: 0;
 }
 
