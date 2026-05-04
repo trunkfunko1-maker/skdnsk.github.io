@@ -1,19 +1,25 @@
-/* style.css */
+/* 整个页面的外边距清零，防止顶栏和边缘有缝隙 */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
 }
 
+/* 随页面滚动的顶栏 */
 .navbar {
-    background-color: #333; /* 背景深灰色 */
-    padding: 15px;
+    position: relative; /* 或者 static */
+    background-color: #24292e; /* 经典的 GitHub 深色 */
     color: white;
-    text-align: center;
-    top: 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
 }
 
 .navbar a {
     color: white;
-    text-decoration: none; /* 去掉下划线 */
-    margin: 0 15px;
+    text-decoration: none;
+}
+
+/* 给主体内容加点高度，方便测试滚动效果 */
+.content {
+    height: 2000px;
+    padding: 20px;
 }
