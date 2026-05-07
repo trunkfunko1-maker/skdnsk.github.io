@@ -25,11 +25,11 @@
 本站始终致力于维护四川大学附属中学师生的心理健康安全，努力营造良好的校园氛围。
 
 <div style="text-align: center;">
-<img src="https://i.ibb.co/HpB1fJf4/retouch-2026050423533556.jpg" alt="retouch 2026050423533556" border="0" width="31%">
+<img src="https://i.ibb.co/HpB1fJf4/retouch-2026050423533556.jpg" alt="retouch 2026050423533556" border="0" width="50%">
 </div>
 
 <div style="text-align: center;">
-<img src="https://i.ibb.co/YFfvByLR/retouch-2026050500192841-edit-166799889432881.jpg" alt="retouch 2026050500192841 edit 166799889432881" border="0" width="31%">
+<img src="https://i.ibb.co/YFfvByLR/retouch-2026050500192841-edit-166799889432881.jpg" alt="retouch 2026050500192841 edit 166799889432881" border="0" width="50%">
 </div>
 
 <!-- _includes/footer.html -->
