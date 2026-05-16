@@ -13,7 +13,7 @@
         <a href="24.html">王茂纲</a>
     </div>
     <div class="navbar">
-        <a href="22.html">怪物鸡吧</a>
+        <a href="game.html">小游戏</a>
         <a href="25.html">异闻录</a>
         <a href="22.html">怪物鸡吧</a>
     </div>
