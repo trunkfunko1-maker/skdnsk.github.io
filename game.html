@@ -13,7 +13,7 @@
             -webkit-user-select: none;
         }
         body {
-            background-color: #121212;
+            background: linear-gradient(135deg, #0f0c20 0%, #15102a 100%);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* 游戏主容器 */
+        /* 游戏主容器（默认手机端，切换后通过类名动态改变） */
         #wrapper {
             position: relative;
             width: 100%;
@@ -34,9 +34,20 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
 
-        /* 顶栏重构 */
+        /* 🖥️ 电脑端网页动态样式扩展 */
+        #wrapper.pc-mode {
+            max-width: 800px;
+            max-height: 600px;
+            height: 600px;
+            border: 4px solid #3d346d;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(91, 77, 163, 0.2);
+        }
+
+        /* 顶栏 */
         #status-bar {
             display: flex;
             justify-content: space-between;
@@ -46,6 +57,11 @@
             border-bottom: 2px solid #2d2d2d;
             z-index: 5;
         }
+        #wrapper.pc-mode #status-bar {
+            padding: 15px 25px;
+            background: #18142c;
+            border-bottom: 3px solid #282147;
+        }
 
         .sb-left {
             font-size: 16px;
@@ -54,7 +70,6 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* 顶栏左侧链接专属样式 */
         .sb-link {
             color: #ffffff;
             text-decoration: none;
@@ -62,7 +77,7 @@
             cursor: pointer;
         }
         .sb-link:hover {
-            color: #2ed573; /* 鼠标悬停时变绿，提示可点击 */
+            color: #2ed573;
         }
 
         .sb-right {
@@ -81,7 +96,7 @@
             color: #fff200;
         }
 
-        /* 画布区域自适应 */
+        /* 画布区域 */
         #canvas-container {
             position: relative;
             flex-grow: 1;
@@ -94,14 +109,14 @@
             display: block;
         }
 
-        /* 遮罩层（开始/结束界面） */
+        /* 遮罩层（初始和结束界面） */
         .overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -117,11 +132,37 @@
             color: #ff4757; 
             line-height: 1.4; 
         }
-        .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.6; }
-        .overlay button {
-            padding: 12px 35px;
+        .overlay p { margin-bottom: 20px; font-size: 14px; color: #ccc; line-height: 1.6; }
+
+        /* 🎯 选项按钮行：手机端/电脑端切换 */
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .mode-btn {
+            padding: 8px 18px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .mode-btn.active {
+            background: #ff4757;
+            color: #fff;
+            border-color: #ff4757;
+            box-shadow: 0 0 12px rgba(255, 71, 87, 0.5);
+        }
+
+        /* 开始/结算通用主按钮 */
+        .main-btn {
+            padding: 12px 45px;
             font-size: 18px;
-            background: #2ed573;
+            background: linear-gradient(180deg, #2ed573 0%, #26af5f 100%);
             color: white;
             border: none;
             border-radius: 25px;
@@ -142,6 +183,11 @@
             align-items: flex-end;
             pointer-events: none; 
             z-index: 8;
+            transition: opacity 0.3s ease;
+        }
+        /* 当处于电脑端网页模式时，完全隐藏手机按键盘 */
+        #wrapper.pc-mode #mobile-controller {
+            display: none !important;
         }
 
         /* 左手十字键 */
@@ -189,23 +235,16 @@
             font-size: 32px;
             border: 2px solid rgba(255, 71, 87, 0.8);
             box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
         }
         #btn-fire:active {
             background: rgba(255, 71, 87, 0.9);
             transform: scale(0.95);
         }
-
-        @media (min-width: 1024px) {
-            .ctrl-btn, .dpad, #btn-fire {
-                opacity: 0.3; 
-            }
-        }
     </style>
 </head>
 <body>
 
+    <!-- 主容器 -->
     <div id="wrapper">
         <!-- 顶栏 DOM -->
         <div id="status-bar">
@@ -225,8 +264,15 @@
             <!-- 浮层界面 -->
             <div id="overlay" class="overlay">
                 <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
-                <p id="overlay-desc">使用键盘 WASD / 方向键，或屏幕虚拟摇杆控制<br>空格键或右下角红按钮开火！<br><b style="color:#ff4757;">注意：千万不要碰到落下的炮弹！</b></p>
-                <button id="start-btn" onclick="startGame()">开始游戏</button>
+                <p id="overlay-desc">请先选择对应的网页游玩终端：</p>
+                
+                <!-- 🎯 核心新增：终端模式选择器 -->
+                <div class="mode-selector" id="selector-box">
+                    <button class="mode-btn active" id="mode-mobile" onclick="switchMode('mobile')">📱 手机端网页</button>
+                    <button class="mode-btn" id="mode-pc" onclick="switchMode('pc')">🖥️ 电脑端网页</button>
+                </div>
+
+                <button id="start-btn" class="main-btn" onclick="startGame()">开始游戏</button>
             </div>
         </div>
 
@@ -250,6 +296,9 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('canvas-container');
+    const wrapper = document.getElementById('wrapper');
+
+    let currentDeviceMode = 'mobile'; // 默认模式：mobile 或 pc
 
     function resizeCanvas() {
         canvas.width = container.clientWidth;
@@ -258,9 +307,37 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- 专用图片资源链接 ---
+    // 🎯 新增：初始界面点击切换手机端/电脑端渲染模式
+    function switchMode(mode) {
+        if(isPlaying) return;
+        currentDeviceMode = mode;
+        
+        const btnMobile = document.getElementById('mode-mobile');
+        const btnPC = document.getElementById('mode-pc');
+        const descText = document.getElementById('overlay-desc');
+
+        if(mode === 'pc') {
+            wrapper.classList.add('pc-mode');
+            btnPC.classList.add('active');
+            btnMobile.classList.remove('active');
+            descText.innerHTML = "【电脑端控制指南】<br>移动：键盘 WASD 键 或 方向键<br>开火：空格键 或 J 键<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
+            // 电脑端微调参数
+            player.size = 45;
+            player.speed = 7;
+        } else {
+            wrapper.classList.remove('pc-mode');
+            btnMobile.classList.add('active');
+            btnPC.classList.remove('active');
+            descText.innerHTML = "使用屏幕虚拟操作盘 或 键盘WASD控制控制机体<br>右下角红按钮或空格开火！<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
+            // 手机端微调参数
+            player.size = 40;
+            player.speed = 6;
+        }
+        setTimeout(resizeCanvas, 50); // 延迟重算画布宽高度
+    }
+
+    // --- 图片资源 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
-    // 🎯 核心修改：已更新被击中后的图片链接
     const ENEMY_HIT_SRC = 'https://i.ibb.co/F4jXTCjw/retouch-2026051701391671.png';   
 
     const imgAlive = new Image(); imgAlive.src = ENEMY_ALIVE_SRC;
@@ -295,19 +372,11 @@
     // 触控监听
     function setupMobileControl(btnId, direction) {
         const btn = document.getElementById(btnId);
-        
         btn.addEventListener('touchstart', (e) => {
-            if (direction === 'fire') {
-                fireBullet();
-            } else {
-                keys[direction] = true;
-            }
+            if (direction === 'fire') { fireBullet(); } else { keys[direction] = true; }
         });
-
         btn.addEventListener('touchend', (e) => {
-            if (direction !== 'fire') {
-                keys[direction] = false;
-            }
+            if (direction !== 'fire') { keys[direction] = false; }
         });
     }
 
@@ -323,14 +392,15 @@
             x: player.x + player.size / 2 - 3, 
             y: player.y, 
             width: 6, 
-            height: 18, 
-            speed: 9 
+            height: currentDeviceMode === 'pc' ? 20 : 18, 
+            speed: currentDeviceMode === 'pc' ? 11 : 9 
         });
     }
 
     function spawnEnemy() {
-        if(Math.random() < 0.04) {
-            const enemySize = 60; 
+        let spawnRate = currentDeviceMode === 'pc' ? 0.05 : 0.04;
+        if(Math.random() < spawnRate) {
+            const enemySize = currentDeviceMode === 'pc' ? 65 : 60; 
             enemies.push({
                 x: Math.random() * (canvas.width - enemySize),
                 y: -enemySize,
@@ -352,7 +422,7 @@
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        // 自机渲染
+        // 自机
         ctx.fillStyle = '#2ed573';
         ctx.beginPath();
         ctx.moveTo(player.x + player.size / 2, player.y);
@@ -361,7 +431,7 @@
         ctx.closePath();
         ctx.fill();
 
-        // 子弹渲染与逻辑
+        // 子弹
         for (let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
             b.y -= b.speed;
@@ -370,7 +440,7 @@
             if(b.y < 0) bullets.splice(i, 1);
         }
 
-        // 敌人渲染与核心碰撞检测
+        // 敌人
         spawnEnemy();
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
@@ -379,23 +449,19 @@
                 enemy.y += enemy.speed;
                 ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
 
-                // 越界检查
                 if (enemy.y > canvas.height) {
                     enemies.splice(i, 1);
                     continue;
                 }
 
-                // 自机与炮弹的碰撞检测
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
                     player.y + player.size > enemy.y) {
-                    
                     endGame('hit'); 
                     return; 
                 }
 
-                // 子弹与敌人碰撞
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -413,9 +479,7 @@
             } else if (enemy.status === 'hit') {
                 ctx.drawImage(imgHit, enemy.x, enemy.y, enemy.size, enemy.size);
                 enemy.hitTimer++;
-                if (enemy.hitTimer > 5) {
-                    enemies.splice(i, 1);
-                }
+                if (enemy.hitTimer > 5) { enemies.splice(i, 1); }
             }
         }
 
@@ -431,7 +495,7 @@
         bullets = [];
         enemies = [];
         player.x = canvas.width / 2 - player.size / 2;
-        player.y = canvas.height * 0.75;
+        player.y = canvas.height * 0.78;
         
         document.getElementById('score-val').innerText = score;
         document.getElementById('time-val').innerText = timeLeft;
@@ -443,9 +507,7 @@
         countdownInterval = setInterval(() => {
             timeLeft--;
             document.getElementById('time-val').innerText = timeLeft;
-            if(timeLeft <= 0) {
-                endGame('timeout'); 
-            }
+            if(timeLeft <= 0) { endGame('timeout'); }
         }, 1000);
     }
 
@@ -454,6 +516,8 @@
         clearInterval(countdownInterval);
         
         const descElement = document.getElementById('overlay-desc');
+        // 游戏结束后重新把选择器显现，允许玩家重新选择分类重新开局
+        document.getElementById('selector-box').style.display = 'flex'; 
         
         if (reason === 'hit') {
             document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
@@ -466,6 +530,9 @@
         document.getElementById('start-btn').innerText = "再次挑战";
         document.getElementById('overlay').style.display = 'flex';
     }
+
+    // 初始化调用一次，确保文字对应上
+    switchMode('mobile');
 </script>
 </body>
 </html>
