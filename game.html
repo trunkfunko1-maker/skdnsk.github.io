@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>打飞机小游戏 - 触控增强版</title>
+    <title>打飞机小游戏 - 生存挑战版</title>
     <style>
         * {
             box-sizing: border-box;
@@ -79,7 +79,7 @@
             padding: 20px;
         }
         .overlay h2 { margin-bottom: 15px; font-size: 28px; color: #ff4757; }
-        .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; }
+        .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.5; }
         .overlay button {
             padding: 12px 35px;
             font-size: 18px;
@@ -182,7 +182,7 @@
             <!-- 浮层界面 -->
             <div id="overlay" class="overlay">
                 <h2 id="overlay-title">打飞机大作战</h2>
-                <p id="overlay-desc">使用键盘 WASD / 方向键，或屏幕虚拟摇杆控制<br>空格键或右下角红按钮开火！</p>
+                <p id="overlay-desc">使用键盘 WASD / 方向键，或屏幕虚拟摇杆控制<br>空格键或右下角红按钮开火！<br><b style="color:#ff4757;">注意：千万不要碰到落下的炮弹！</b></p>
                 <button id="start-btn" onclick="startGame()">开始游戏</button>
             </div>
         </div>
@@ -215,7 +215,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- 🎯 占位图片链接，可替换为你自己的 URL ---
+    // --- 🎯 替换为你自己的图片资源链接 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
     const ENEMY_HIT_SRC = 'https://i.ibb.co/W421Gjxk/retouch-2026051700424675.png';   
 
@@ -227,7 +227,7 @@
     let isPlaying = false;
     let countdownInterval = null;
 
-    let player = { x: 0, y: 0, size: 45, speed: 6 };
+    let player = { x: 0, y: 0, size: 40, speed: 6 }; // 略微调小自机判定，让操作更丝滑
     let bullets = [];
     let enemies = [];
     let keys = { up: false, down: false, left: false, right: false };
@@ -244,6 +244,7 @@
     window.addEventListener('keyup', e => {
         if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
         if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
+        if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.false;
         if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
         if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
@@ -292,7 +293,7 @@
                 x: Math.random() * (canvas.width - 45),
                 y: -50,
                 size: 45,
-                speed: 2.5 + Math.random() * 3,
+                speed: 2.2 + Math.random() * 2.8,
                 status: 'alive', 
                 hitTimer: 0     
             });
@@ -309,7 +310,7 @@
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        // 自机
+        // 自机渲染
         ctx.fillStyle = '#2ed573';
         ctx.beginPath();
         ctx.moveTo(player.x + player.size / 2, player.y);
@@ -318,7 +319,7 @@
         ctx.closePath();
         ctx.fill();
 
-        // 子弹
+        // 子弹渲染与逻辑
         for (let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
             b.y -= b.speed;
@@ -327,7 +328,7 @@
             if(b.y < 0) bullets.splice(i, 1);
         }
 
-        // 敌人
+        // 敌人渲染与核心碰撞检测
         spawnEnemy();
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
@@ -336,11 +337,23 @@
                 enemy.y += enemy.speed;
                 ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
 
+                // 越界检查
                 if (enemy.y > canvas.height) {
                     enemies.splice(i, 1);
                     continue;
                 }
 
+                // ⚡ 新增：自机与炮弹的碰撞检测（AABB检测机制）
+                if (player.x < enemy.x + enemy.size &&
+                    player.x + player.size > enemy.x &&
+                    player.y < enemy.y + enemy.size &&
+                    player.y + player.size > enemy.y) {
+                    
+                    endGame('hit'); // 传入坠毁原因，终止游戏
+                    return; 
+                }
+
+                // 子弹与敌人碰撞
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -367,9 +380,8 @@
         requestAnimationFrame(gameLoop);
     }
 
-    // --- 🛠️ 这里已修复已经可以正常隐藏和运行 ---
     function startGame() {
-        document.getElementById('overlay').style.display = 'none'; // 已修复错误
+        document.getElementById('overlay').style.display = 'none';
         resizeCanvas();
         
         score = 0;
@@ -385,22 +397,29 @@
         isPlaying = true;
         gameLoop();
 
-        clearInterval(countdownInterval); // 清除可能残存的定时器
+        clearInterval(countdownInterval);
         countdownInterval = setInterval(() => {
             timeLeft--;
             document.getElementById('time-val').innerText = timeLeft;
             if(timeLeft <= 0) {
-                endGame();
+                endGame('timeout'); // 传入时间到原因
             }
         }, 1000);
     }
 
-    function endGame() {
+    // 优化后的结束逻辑，动态判定失败原因
+    function endGame(reason) {
         isPlaying = false;
         clearInterval(countdownInterval);
         
-        document.getElementById('overlay-title').innerText = "时间到，游戏结束！";
-        document.getElementById('overlay-desc').innerText = `您在 30 秒内总共斩获了：${score} 分`;
+        if (reason === 'hit') {
+            document.getElementById('overlay-title').innerText = "战机坠毁，游戏结束！";
+            document.getElementById('overlay-desc').innerText = `很遗憾，您正面撞上了炮弹！💥<br>最终斩获积分：${score} 分`;
+        } else {
+            document.getElementById('overlay-title').innerText = "时间到，完美生还！";
+            document.getElementById('overlay-desc').innerText = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br>最终统计算分：${score} 分`;
+        }
+        
         document.getElementById('start-btn').innerText = "再次挑战";
         document.getElementById('overlay').style.display = 'flex';
     }
