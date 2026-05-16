@@ -54,7 +54,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* 🎯 顶栏左侧链接专属样式 */
+        /* 顶栏左侧链接专属样式 */
         .sb-link {
             color: #ffffff;
             text-decoration: none;
@@ -209,7 +209,6 @@
     <div id="wrapper">
         <!-- 顶栏 DOM -->
         <div id="status-bar">
-            <!-- 🎯 核心修改：加了 a 标签链接到 index.html -->
             <div class="sb-left">
                 <a href="index.html" class="sb-link" user-select="auto">川大附中天堂网</a>
             </div>
@@ -261,7 +260,8 @@
 
     // --- 专用图片资源链接 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
-    const ENEMY_HIT_SRC = 'https://i.ibb.co/W421Gjxk/retouch-2026051700424675.png';   
+    // 🎯 核心修改：已更新被击中后的图片链接
+    const ENEMY_HIT_SRC = 'https://i.ibb.co/F4jXTCjw/retouch-2026051701391671.png';   
 
     const imgAlive = new Image(); imgAlive.src = ENEMY_ALIVE_SRC;
     const imgHit = new Image(); imgHit.src = ENEMY_HIT_SRC;
