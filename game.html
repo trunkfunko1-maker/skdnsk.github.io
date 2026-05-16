@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>打飞机小游戏 - 生存挑战版</title>
+    <title>打飞机小游戏 - 专属定制版</title>
     <style>
         * {
             box-sizing: border-box;
@@ -215,7 +215,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- 🎯 替换为你自己的图片资源链接 ---
+    // --- 🎯 已替换为你指定的专用图片资源链接 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
     const ENEMY_HIT_SRC = 'https://i.ibb.co/W421Gjxk/retouch-2026051700424675.png';   
 
@@ -227,7 +227,7 @@
     let isPlaying = false;
     let countdownInterval = null;
 
-    let player = { x: 0, y: 0, size: 40, speed: 6 }; // 略微调小自机判定，让操作更丝滑
+    let player = { x: 0, y: 0, size: 40, speed: 6 }; 
     let bullets = [];
     let enemies = [];
     let keys = { up: false, down: false, left: false, right: false };
@@ -244,7 +244,6 @@
     window.addEventListener('keyup', e => {
         if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = false;
         if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = false;
-        if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.false;
         if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
         if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
@@ -289,10 +288,12 @@
 
     function spawnEnemy() {
         if(Math.random() < 0.04) {
+            // 已将尺寸调整为 60
+            const enemySize = 60;
             enemies.push({
-                x: Math.random() * (canvas.width - 45),
-                y: -50,
-                size: 45,
+                x: Math.random() * (canvas.width - enemySize),
+                y: -enemySize,
+                size: enemySize,
                 speed: 2.2 + Math.random() * 2.8,
                 status: 'alive', 
                 hitTimer: 0     
@@ -343,13 +344,13 @@
                     continue;
                 }
 
-                // ⚡ 新增：自机与炮弹的碰撞检测（AABB检测机制）
+                // 自机与炮弹的碰撞检测
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
                     player.y + player.size > enemy.y) {
                     
-                    endGame('hit'); // 传入坠毁原因，终止游戏
+                    endGame('hit'); 
                     return; 
                 }
 
@@ -402,12 +403,11 @@
             timeLeft--;
             document.getElementById('time-val').innerText = timeLeft;
             if(timeLeft <= 0) {
-                endGame('timeout'); // 传入时间到原因
+                endGame('timeout'); 
             }
         }, 1000);
     }
 
-    // 优化后的结束逻辑，动态判定失败原因
     function endGame(reason) {
         isPlaying = false;
         clearInterval(countdownInterval);
