@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>打飞机小游戏 - 专属定制版</title>
+    <title>王茂钢打飞机大作战</title>
     <style>
         * {
             box-sizing: border-box;
@@ -75,10 +75,15 @@
             align-items: center;
             color: white;
             z-index: 10;
-            text-align: center;
+            text-align: center; /* 确保所有文字包括提行后都居中 */
             padding: 20px;
         }
-        .overlay h2 { margin-bottom: 15px; font-size: 28px; color: #ff4757; }
+        .overlay h2 { 
+            margin-bottom: 15px; 
+            font-size: 28px; 
+            color: #ff4757; 
+            line-height: 1.4; /* 调整行高让两行字更好看 */
+        }
         .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.5; }
         .overlay button {
             padding: 12px 35px;
@@ -181,7 +186,8 @@
             
             <!-- 浮层界面 -->
             <div id="overlay" class="overlay">
-                <h2 id="overlay-title">打飞机大作战</h2>
+                <!-- 🎯 初始页面标题已修改为提行并居中 -->
+                <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
                 <p id="overlay-desc">使用键盘 WASD / 方向键，或屏幕虚拟摇杆控制<br>空格键或右下角红按钮开火！<br><b style="color:#ff4757;">注意：千万不要碰到落下的炮弹！</b></p>
                 <button id="start-btn" onclick="startGame()">开始游戏</button>
             </div>
@@ -215,7 +221,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- 🎯 已替换为你指定的专用图片资源链接 ---
+    // --- 🎯 专用图片资源链接 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
     const ENEMY_HIT_SRC = 'https://i.ibb.co/W421Gjxk/retouch-2026051700424675.png';   
 
@@ -288,8 +294,7 @@
 
     function spawnEnemy() {
         if(Math.random() < 0.04) {
-            // 已将尺寸调整为 60
-            const enemySize = 60;
+            const enemySize = 60; // 保持大尺寸
             enemies.push({
                 x: Math.random() * (canvas.width - enemySize),
                 y: -enemySize,
@@ -412,11 +417,12 @@
         isPlaying = false;
         clearInterval(countdownInterval);
         
+        // 🎯 游戏结束后的动态标题也统一修改并支持换行
         if (reason === 'hit') {
-            document.getElementById('overlay-title').innerText = "战机坠毁，游戏结束！";
+            document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
             document.getElementById('overlay-desc').innerText = `很遗憾，您正面撞上了炮弹！💥<br>最终斩获积分：${score} 分`;
         } else {
-            document.getElementById('overlay-title').innerText = "时间到，完美生还！";
+            document.getElementById('overlay-title').innerHTML = "时间到<br>完美生还！";
             document.getElementById('overlay-desc').innerText = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br>最终统计算分：${score} 分`;
         }
         
