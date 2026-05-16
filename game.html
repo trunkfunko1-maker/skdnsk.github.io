@@ -107,7 +107,7 @@
             color: #ff4757; 
             line-height: 1.4; 
         }
-        .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.5; }
+        .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.6; }
         .overlay button {
             padding: 12px 35px;
             font-size: 18px;
@@ -324,7 +324,6 @@
                 x: Math.random() * (canvas.width - enemySize),
                 y: -enemySize,
                 size: enemySize,
-                // 🎯 优化：将原本的 2.2 + Math.random() * 2.8 提升至 3.0 + Math.random() * 3.5
                 speed: 3.0 + Math.random() * 3.5,
                 status: 'alive', 
                 hitTimer: 0     
@@ -443,12 +442,15 @@
         isPlaying = false;
         clearInterval(countdownInterval);
         
+        const descElement = document.getElementById('overlay-desc');
+        
         if (reason === 'hit') {
             document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
-            document.getElementById('overlay-desc').innerText = `很遗憾，您正面撞上了炮弹！💥<br>最终斩获积分：${score} 分`;
+            // 🎯 核心修改：更新指定中弹描述，并加入换行符
+            descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
             document.getElementById('overlay-title').innerHTML = "时间到<br>完美生还！";
-            document.getElementById('overlay-desc').innerText = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br>最终统计算分：${score} 分`;
+            descElement.innerHTML = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br><br>最终统计算分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         }
         
         document.getElementById('start-btn').innerText = "再次挑战";
@@ -456,4 +458,4 @@
     }
 </script>
 </body>
-</html>
+    </html>
