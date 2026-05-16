@@ -48,11 +48,21 @@
         }
 
         .sb-left {
-            color: #ffffff;
             font-size: 16px;
             font-weight: 800;
             letter-spacing: 0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* 🎯 顶栏左侧链接专属样式 */
+        .sb-link {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+        .sb-link:hover {
+            color: #2ed573; /* 鼠标悬停时变绿，提示可点击 */
         }
 
         .sb-right {
@@ -199,7 +209,10 @@
     <div id="wrapper">
         <!-- 顶栏 DOM -->
         <div id="status-bar">
-            <div class="sb-left">川大附中天堂网</div>
+            <!-- 🎯 核心修改：加了 a 标签链接到 index.html -->
+            <div class="sb-left">
+                <a href="index.html" class="sb-link" user-select="auto">川大附中天堂网</a>
+            </div>
             <div class="sb-right">
                 <div class="data-item">得分: <span id="score-val" class="data-highlight">0</span></div>
                 <div class="data-item">时间: <span id="time-val" class="data-highlight">30</span>s</div>
@@ -284,20 +297,18 @@
         const btn = document.getElementById(btnId);
         
         btn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
             if (direction === 'fire') {
                 fireBullet();
             } else {
                 keys[direction] = true;
             }
-        }, { passive: false });
+        });
 
         btn.addEventListener('touchend', (e) => {
-            e.preventDefault();
             if (direction !== 'fire') {
                 keys[direction] = false;
             }
-        }, { passive: false });
+        });
     }
 
     setupMobileControl('btn-up', 'up');
@@ -446,7 +457,6 @@
         
         if (reason === 'hit') {
             document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
-            // 🎯 核心修改：更新指定中弹描述，并加入换行符
             descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
             document.getElementById('overlay-title').innerHTML = "时间到<br>完美生还！";
@@ -458,4 +468,4 @@
     }
 </script>
 </body>
-    </html>
+</html>
