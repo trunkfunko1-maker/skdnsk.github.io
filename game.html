@@ -36,16 +36,39 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
         }
 
-        /* 状态栏 */
+        /* 顶栏重构 */
         #status-bar {
             display: flex;
             justify-content: space-between;
-            padding: 15px 20px;
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
+            align-items: center;
+            padding: 12px 15px;
             background: #1e1e1e;
+            border-bottom: 2px solid #2d2d2d;
             z-index: 5;
+        }
+
+        .sb-left {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .sb-right {
+            display: flex;
+            gap: 12px;
+            color: #ccc;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .data-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .data-highlight {
+            color: #fff200;
         }
 
         /* 画布区域自适应 */
@@ -75,14 +98,14 @@
             align-items: center;
             color: white;
             z-index: 10;
-            text-align: center; /* 确保所有文字包括提行后都居中 */
+            text-align: center; 
             padding: 20px;
         }
         .overlay h2 { 
             margin-bottom: 15px; 
             font-size: 28px; 
             color: #ff4757; 
-            line-height: 1.4; /* 调整行高让两行字更好看 */
+            line-height: 1.4; 
         }
         .overlay p { margin-bottom: 25px; font-size: 16px; color: #ccc; line-height: 1.5; }
         .overlay button {
@@ -174,10 +197,13 @@
 <body>
 
     <div id="wrapper">
-        <!-- 顶部数据状态 -->
+        <!-- 顶栏 DOM -->
         <div id="status-bar">
-            <div>得分: <span id="score-val">0</span></div>
-            <div>倒计时: <span id="time-val">30</span>s</div>
+            <div class="sb-left">川大附中天堂网</div>
+            <div class="sb-right">
+                <div class="data-item">得分: <span id="score-val" class="data-highlight">0</span></div>
+                <div class="data-item">时间: <span id="time-val" class="data-highlight">30</span>s</div>
+            </div>
         </div>
 
         <!-- 游戏核心舞台 -->
@@ -186,7 +212,6 @@
             
             <!-- 浮层界面 -->
             <div id="overlay" class="overlay">
-                <!-- 🎯 初始页面标题已修改为提行并居中 -->
                 <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
                 <p id="overlay-desc">使用键盘 WASD / 方向键，或屏幕虚拟摇杆控制<br>空格键或右下角红按钮开火！<br><b style="color:#ff4757;">注意：千万不要碰到落下的炮弹！</b></p>
                 <button id="start-btn" onclick="startGame()">开始游戏</button>
@@ -221,7 +246,7 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- 🎯 专用图片资源链接 ---
+    // --- 专用图片资源链接 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
     const ENEMY_HIT_SRC = 'https://i.ibb.co/W421Gjxk/retouch-2026051700424675.png';   
 
@@ -294,12 +319,13 @@
 
     function spawnEnemy() {
         if(Math.random() < 0.04) {
-            const enemySize = 60; // 保持大尺寸
+            const enemySize = 60; 
             enemies.push({
                 x: Math.random() * (canvas.width - enemySize),
                 y: -enemySize,
                 size: enemySize,
-                speed: 2.2 + Math.random() * 2.8,
+                // 🎯 优化：将原本的 2.2 + Math.random() * 2.8 提升至 3.0 + Math.random() * 3.5
+                speed: 3.0 + Math.random() * 3.5,
                 status: 'alive', 
                 hitTimer: 0     
             });
@@ -417,7 +443,6 @@
         isPlaying = false;
         clearInterval(countdownInterval);
         
-        // 🎯 游戏结束后的动态标题也统一修改并支持换行
         if (reason === 'hit') {
             document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
             document.getElementById('overlay-desc').innerText = `很遗憾，您正面撞上了炮弹！💥<br>最终斩获积分：${score} 分`;
