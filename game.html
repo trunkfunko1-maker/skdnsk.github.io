@@ -422,7 +422,7 @@
     let specialSpawnSeconds = [];
     let bombSpawnSeconds = []; 
 
-    // 🎇 炸弹粒子效果系统设定
+    // 🎇 炸弹火星粒子效果系统
     let bombExplosionParticles = [];
     let isBombExploding = false;
     let bombExplosionTimer = 0;
@@ -496,22 +496,27 @@
         ctx.restore();
     }
 
-    // 创建炸弹爆炸粒子
+    // 🎇 创建炸弹“火星四射”颗粒动画
     function createBombExplosion(x, y) {
         bombExplosionParticles = [];
         isBombExploding = true;
-        bombExplosionTimer = 45; // 持续约 45 帧动画
+        bombExplosionTimer = 55; // 稍长一点让火星完美散尽
         
-        for (let i = 0; i < 70; i++) {
+        // 喷射出 90 颗火星，打造极其震撼的四射效果
+        for (let i = 0; i < 90; i++) {
             let angle = Math.random() * Math.PI * 2;
-            let speed = 2 + Math.random() * 9;
+            let speed = 3 + Math.random() * 12; // 极高的初始喷射速度
+            
             bombExplosionParticles.push({
                 x: x,
                 y: y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                size: 4 + Math.random() * 7,
-                color: Math.random() > 0.4 ? (Math.random() > 0.5 ? '#ff3838' : '#ff9f43') : '#ffffff'
+                gravity: 0.05 + Math.random() * 0.1, // 新增火星重力下坠
+                // 模拟火星的颜色变换：亮黄、耀眼橙、暗红炭化
+                colorSeed: Math.random(),
+                size: 2 + Math.random() * 3.5, // 火星比普通碎片更细碎、更密集
+                alpha: 1
             });
         }
     }
@@ -629,33 +634,51 @@
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 炸弹爆炸状态下的独立物理动效分支
+        // 💥 火星四射：炸弹独立渲染渲染物理系统
         if (isBombExploding) {
-            // 利用半透明黑色覆盖，做出极其炫酷的粒子拖尾微光效果
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+            // 利用高层半透黑做出夜空中金黄色火星滑过的绝佳“火线拖尾”效果
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 更新并渲染爆炸碎片粒子
+            // 更新并重新绘制高速溅射的火星颗粒
             for (let i = bombExplosionParticles.length - 1; i >= 0; i--) {
                 let p = bombExplosionParticles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vx *= 0.95; // 空气阻力
-                p.vy *= 0.95;
+                p.vy += p.gravity; // 微弱环境重力，让火星下坠更自然
+                p.vx *= 0.94;      // 强空气阻力让火星迅速减速
+                p.vy *= 0.94;
+                p.size *= 0.96;    // 燃尽缩减
+                p.alpha -= 0.015;
+
+                if (p.size <= 0.2 || p.alpha <= 0) {
+                    bombExplosionParticles.splice(i, 1);
+                    continue;
+                }
                 
-                ctx.fillStyle = p.color;
+                // 随阻力和时间演化的火星色彩（先金黄 -> 再红橙 -> 最终暗红熄灭）
+                let r = 255;
+                let g = Math.floor(220 * (p.alpha) * (p.colorSeed > 0.3 ? 1 : 0.4));
+                let b = Math.floor(50 * (p.alpha * p.alpha));
+                
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                
+                // 画圆形小火星
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.restore();
             }
 
             bombExplosionTimer--;
-            if (bombExplosionTimer <= 0) {
+            if (bombExplosionTimer <= 0 || bombExplosionParticles.length === 0) {
                 isBombExploding = false;
-                endGame('bomb'); // 粒子放完，直接宣告游戏彻底结束
+                endGame('bomb'); // 粒子燃尽，直接结束
                 return;
             }
-            requestAnimationFrame(gameLoop); // 💡核心修复：确保爆炸动画期间每一帧都能继续运转
+            requestAnimationFrame(gameLoop); 
             return;
         }
 
@@ -696,7 +719,7 @@
                     continue;
                 }
 
-                // 战机撞击物体检测
+                // 战机撞击物体
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
@@ -704,14 +727,14 @@
                     if (enemy.isBomb) {
                         clearInterval(countdownInterval);
                         createBombExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
-                        requestAnimationFrame(gameLoop); // 💡核心修复：启动下一帧爆炸重绘
+                        requestAnimationFrame(gameLoop); 
                     } else {
                         endGame('hit'); 
                     }
                     return; 
                 }
 
-                // 子弹击中物体检测
+                // 子弹击中物体
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -724,7 +747,7 @@
                         if (enemy.isBomb) {
                             clearInterval(countdownInterval);
                             createBombExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
-                            requestAnimationFrame(gameLoop); // 💡核心修复：启动下一帧爆炸重绘
+                            requestAnimationFrame(gameLoop); 
                             return; 
                         }
                         
@@ -777,7 +800,6 @@
             if(!specialSpawnSeconds.includes(targetSecond)) { specialSpawnSeconds.push(targetSecond); }
         }
 
-        // 随机生成炸弹飞机的秒数 (出现0-2次)
         bombSpawnSeconds = [];
         const bombCount = Math.floor(Math.random() * 3); 
         while(bombSpawnSeconds.length < bombCount) {
@@ -818,7 +840,8 @@
         if (reason === 'bomb') {
             titleElement.classList.add('bomb-title'); 
             titleElement.innerHTML = "炸弹爆炸<br>游戏结束！";
-            descElement.innerHTML = `噢不！你误击了高危炸弹炮弹！💥<br>连锁反应已瞬间将你湮灭！`;
+            // 💡 提示词已经按要求更新且支持多行提行显示
+            descElement.innerHTML = `你误击了高危炸弹肛毛！<br>肛毛已将你瞬间湮灭！`;
         } else if (reason === 'hit') {
             titleElement.innerHTML = "战机坠毁<br>游戏结束！";
             descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
