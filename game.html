@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>王茂钢打飞机大作战</title>
     <style>
         * {
@@ -21,8 +21,8 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            min-height: 100dvh; /* 适配移动端动态视口 */
             overflow: hidden;
-            padding: 20px 0;
         }
 
         /* 游戏主容器 */
@@ -30,13 +30,14 @@
             position: relative;
             width: 100%;
             max-width: 450px;
-            height: calc(100vh - 60px);
-            max-height: 800px;
+            height: 100vh;
+            height: 100dvh; /* 撑满动态屏幕，防止被移动端工具栏挤压 */
             background: #000;
             display: flex;
             flex-direction: column;
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
             transition: all 0.3s ease;
+            overflow: hidden;
         }
 
         /* 🖥️ 电脑端网页动态样式扩展 */
@@ -58,6 +59,7 @@
             background: #1e1e1e;
             border-bottom: 2px solid #2d2d2d;
             z-index: 5;
+            flex-shrink: 0; /* 绝对不允许被挤压 */
         }
         #wrapper.pc-mode #status-bar {
             padding: 15px 25px;
@@ -104,6 +106,7 @@
             flex-grow: 1;
             width: 100%;
             background: #050505;
+            overflow: hidden;
         }
         canvas {
             width: 100%;
@@ -118,16 +121,26 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.92);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between; /* 改变对齐方式，让内容与底部版权拉开 */
             align-items: center;
             color: white;
             z-index: 10;
             text-align: center; 
-            padding: 20px;
+            padding: 40px 20px 20px 20px; /* 留出底部和顶部内边距 */
         }
+        
+        .overlay-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
         .overlay h2 { 
             margin-bottom: 15px; 
             font-size: 28px; 
@@ -236,13 +249,13 @@
             transform: scale(0.95);
         }
 
-        /* 🎯 底部灰色版权信息标注 */
-        footer {
-            margin-top: 15px;
+        /* 🎯 移入游戏面板底部的灰色版权信息标注 */
+        .overlay-footer {
             font-size: 13px;
-            color: #6a6680;
+            color: #555266;
             letter-spacing: 0.5px;
-            text-align: center;
+            margin-top: 20px;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -263,16 +276,23 @@
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
             
+            <!-- 遮罩层主界面 -->
             <div id="overlay" class="overlay">
-                <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
-                <p id="overlay-desc">请先选择对应的网页游玩终端：</p>
-                
-                <div class="mode-selector" id="selector-box">
-                    <button class="mode-btn active" id="mode-mobile" onclick="switchMode('mobile')">📱 手机端网页</button>
-                    <button class="mode-btn" id="mode-pc" onclick="switchMode('pc')">🖥️ 电脑端网页</button>
+                <!-- 上半部分核心内容 -->
+                <div class="overlay-content">
+                    <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
+                    <p id="overlay-desc">请先选择对应的网页游玩终端：</p>
+                    
+                    <div class="mode-selector" id="selector-box">
+                        <button class="mode-btn active" id="mode-mobile" onclick="switchMode('mobile')">📱 手机端网页</button>
+                        <button class="mode-btn" id="mode-pc" onclick="switchMode('pc')">🖥️ 电脑端网页</button>
+                    </div>
+
+                    <button id="start-btn" class="main-btn" onclick="startGame()">开始游戏</button>
                 </div>
 
-                <button id="start-btn" class="main-btn" onclick="startGame()">开始游戏</button>
+                <!-- 🎯 确保手机端绝对可见的底部灰色版权 -->
+                <div class="overlay-footer">© 2026 川大附中天堂网出品</div>
             </div>
         </div>
 
@@ -289,9 +309,6 @@
         </div>
     </div>
 
-    <!-- 🎯 页面底端版权标注 -->
-    <footer>© 2026 川大附中天堂网出品</footer>
-
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -307,7 +324,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 切换模式（已去除红字说明）
     function switchMode(mode) {
         if(isPlaying) return;
         currentDeviceMode = mode;
