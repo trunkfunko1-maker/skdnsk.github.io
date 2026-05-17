@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* 游戏主容器（默认手机端，切换后通过类名动态改变） */
+        /* 游戏主容器 */
         #wrapper {
             position: relative;
             width: 100%;
@@ -109,7 +109,7 @@
             display: block;
         }
 
-        /* 遮罩层（初始和结束界面） */
+        /* 遮罩层 */
         .overlay {
             position: absolute;
             top: 0;
@@ -134,7 +134,7 @@
         }
         .overlay p { margin-bottom: 20px; font-size: 14px; color: #ccc; line-height: 1.6; }
 
-        /* 🎯 选项按钮行：手机端/电脑端切换 */
+        /* 选项按钮行 */
         .mode-selector {
             display: flex;
             gap: 15px;
@@ -158,7 +158,7 @@
             box-shadow: 0 0 12px rgba(255, 71, 87, 0.5);
         }
 
-        /* 开始/结算通用主按钮 */
+        /* 主按钮 */
         .main-btn {
             padding: 12px 45px;
             font-size: 18px;
@@ -171,7 +171,7 @@
             box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
         }
 
-        /* ====== 📱 手机端专用悬浮操作盘 ====== */
+        /* 📱 手机端专用悬浮操作盘 */
         #mobile-controller {
             position: absolute;
             bottom: 30px;
@@ -185,12 +185,11 @@
             z-index: 8;
             transition: opacity 0.3s ease;
         }
-        /* 当处于电脑端网页模式时，完全隐藏手机按键盘 */
         #wrapper.pc-mode #mobile-controller {
             display: none !important;
         }
 
-        /* 左手十字键 */
+        /* 十字键 */
         .dpad {
             position: relative;
             width: 140px;
@@ -222,7 +221,7 @@
         #btn-right { grid-column: 3; grid-row: 2; border-left: none; border-radius: 0 12px 12px 0; }
         #btn-down { grid-column: 2; grid-row: 3; border-top: none; border-radius: 0 0 12px 12px; }
 
-        /* 右手开火键 */
+        /* 开火键 */
         .fire-sector {
             pointer-events: auto;
         }
@@ -244,12 +243,10 @@
 </head>
 <body>
 
-    <!-- 主容器 -->
     <div id="wrapper">
-        <!-- 顶栏 DOM -->
         <div id="status-bar">
             <div class="sb-left">
-                <a href="index.html" class="sb-link" user-select="auto">川大附中天堂网</a>
+                <a href="index.html" class="sb-link">川大附中天堂网</a>
             </div>
             <div class="sb-right">
                 <div class="data-item">得分: <span id="score-val" class="data-highlight">0</span></div>
@@ -257,16 +254,13 @@
             </div>
         </div>
 
-        <!-- 游戏核心舞台 -->
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
             
-            <!-- 浮层界面 -->
             <div id="overlay" class="overlay">
                 <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
                 <p id="overlay-desc">请先选择对应的网页游玩终端：</p>
                 
-                <!-- 🎯 核心新增：终端模式选择器 -->
                 <div class="mode-selector" id="selector-box">
                     <button class="mode-btn active" id="mode-mobile" onclick="switchMode('mobile')">📱 手机端网页</button>
                     <button class="mode-btn" id="mode-pc" onclick="switchMode('pc')">🖥️ 电脑端网页</button>
@@ -276,7 +270,6 @@
             </div>
         </div>
 
-        <!-- 📱 手机端控制区 -->
         <div id="mobile-controller">
             <div class="dpad">
                 <button class="ctrl-btn" id="btn-up">▲</button>
@@ -298,7 +291,7 @@
     const container = document.getElementById('canvas-container');
     const wrapper = document.getElementById('wrapper');
 
-    let currentDeviceMode = 'mobile'; // 默认模式：mobile 或 pc
+    let currentDeviceMode = 'mobile'; 
 
     function resizeCanvas() {
         canvas.width = container.clientWidth;
@@ -307,7 +300,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // 🎯 新增：初始界面点击切换手机端/电脑端渲染模式
     function switchMode(mode) {
         if(isPlaying) return;
         currentDeviceMode = mode;
@@ -321,19 +313,17 @@
             btnPC.classList.add('active');
             btnMobile.classList.remove('active');
             descText.innerHTML = "【电脑端控制指南】<br>移动：键盘 WASD 键 或 方向键<br>开火：空格键 或 J 键<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
-            // 电脑端微调参数
-            player.size = 45;
+            player.size = 46; // 略微放大战机尺寸适配大屏幕
             player.speed = 7;
         } else {
             wrapper.classList.remove('pc-mode');
             btnMobile.classList.add('active');
             btnPC.classList.remove('active');
             descText.innerHTML = "使用屏幕虚拟操作盘 或 键盘WASD控制控制机体<br>右下角红按钮或空格开火！<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
-            // 手机端微调参数
             player.size = 40;
             player.speed = 6;
         }
-        setTimeout(resizeCanvas, 50); // 延迟重算画布宽高度
+        setTimeout(resizeCanvas, 50); 
     }
 
     // --- 图片资源 ---
@@ -352,6 +342,66 @@
     let bullets = [];
     let enemies = [];
     let keys = { up: false, down: false, left: false, right: false };
+
+    // 绘制高级小战斗机的方法
+    function drawFighter(x, y, size) {
+        ctx.save();
+        ctx.translate(x + size / 2, y + size / 2);
+
+        // 1. 动态发动机尾焰效果
+        if (Math.random() > 0.3) {
+            ctx.fillStyle = Math.random() > 0.5 ? '#ff4757' : '#ffa502';
+            ctx.beginPath();
+            ctx.moveTo(-4, size / 2 - 2);
+            ctx.lineTo(0, size / 2 + 10 + Math.random() * 5);
+            ctx.lineTo(4, size / 2 - 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // 2. 主翼 (两侧的大机翼)
+        ctx.fillStyle = '#26af5f'; // 深绿色主翼底色
+        ctx.beginPath();
+        ctx.moveTo(0, -size / 4);
+        ctx.lineTo(-size / 2, size / 4);
+        ctx.lineTo(size / 2, size / 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. 主机身 (中央流线躯干)
+        ctx.fillStyle = '#2ed573'; // 亮绿色机身
+        ctx.beginPath();
+        ctx.moveTo(0, -size / 2);         // 机头尖端
+        ctx.lineTo(-size / 6, -size / 6);  // 左前侧
+        ctx.lineTo(-size / 8, size / 2);   // 左后尾
+        ctx.lineTo(size / 8, size / 2);    // 右后尾
+        ctx.lineTo(size / 6, -size / 6);   // 右前侧
+        ctx.closePath();
+        ctx.fill();
+
+        // 4. 前翼/侧舷翼板 
+        ctx.fillStyle = '#26af5f';
+        ctx.fillRect(-size / 4, 0, size / 2, size / 12);
+
+        // 5. 炫酷机首与驾驶舱盖
+        ctx.fillStyle = '#00ffff'; // 科技感青色能量舱盖
+        ctx.beginPath();
+        ctx.moveTo(0, -size / 3);
+        ctx.lineTo(-size / 12, -size / 8);
+        ctx.lineTo(size / 12, -size / 8);
+        ctx.closePath();
+        ctx.fill();
+
+        // 6. 尾翼装饰线
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, size / 4);
+        ctx.lineTo(0, size / 2);
+        ctx.stroke();
+
+        ctx.restore();
+    }
 
     // 键盘监听
     window.addEventListener('keydown', e => {
@@ -422,14 +472,8 @@
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        // 自机
-        ctx.fillStyle = '#2ed573';
-        ctx.beginPath();
-        ctx.moveTo(player.x + player.size / 2, player.y);
-        ctx.lineTo(player.x, player.y + player.size);
-        ctx.lineTo(player.x + player.size, player.y + player.size);
-        ctx.closePath();
-        ctx.fill();
+        // 🎯 核心变更点：调用全新的小战斗机绘制方法代替原本的单纯三角形指针
+        drawFighter(player.x, player.y, player.size);
 
         // 子弹
         for (let i = bullets.length - 1; i >= 0; i--) {
@@ -516,7 +560,6 @@
         clearInterval(countdownInterval);
         
         const descElement = document.getElementById('overlay-desc');
-        // 游戏结束后重新把选择器显现，允许玩家重新选择分类重新开局
         document.getElementById('selector-box').style.display = 'flex'; 
         
         if (reason === 'hit') {
@@ -531,7 +574,6 @@
         document.getElementById('overlay').style.display = 'flex';
     }
 
-    // 初始化调用一次，确保文字对应上
     switchMode('mobile');
 </script>
 </body>
