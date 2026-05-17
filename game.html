@@ -388,11 +388,13 @@
     // --- 图片资源 ---
     const ENEMY_ALIVE_SRC = 'https://i.ibb.co/PG22J8FX/Screenshot-20260517-004026-edit-580395464196329.png'; 
     const ENEMY_HIT_SRC = 'https://i.ibb.co/F4jXTCjw/retouch-2026051701391671.png';   
-    const ENEMY_SPECIAL_SRC = 'https://i.ibb.co/6JL1y2FC/Screenshot-20260517-151827.png'; // 🎯 特殊怪物贴图
+    const ENEMY_SPECIAL_SRC = 'https://i.ibb.co/6JL1y2FC/Screenshot-20260517-151827.png'; // 🎯 特殊怪物存活贴图
+    const ENEMY_SPECIAL_HIT_SRC = 'https://i.ibb.co/4b1bxb3/Screenshot-20260517-152843.png'; // 🎯 新增：特殊怪物专属击中贴图
 
     const imgAlive = new Image(); imgAlive.src = ENEMY_ALIVE_SRC;
     const imgHit = new Image(); imgHit.src = ENEMY_HIT_SRC;
     const imgSpecial = new Image(); imgSpecial.src = ENEMY_SPECIAL_SRC;
+    const imgSpecialHit = new Image(); imgSpecialHit.src = ENEMY_SPECIAL_HIT_SRC;
 
     let score = 0;
     let timeLeft = 30;
@@ -551,23 +553,23 @@
         }
     }
 
-    // 🎯 核心新增：生成巨型高速特殊炮弹的方法
+    // 🎯 核心调整：再次放大特殊炮弹并提升速度
     function triggerSpecialSpawn() {
         const baseSize = currentDeviceMode === 'pc' ? 65 : 60;
-        const specialSize = baseSize * 1.5; // 加大1.5倍体积
+        const specialSize = baseSize * 1.7; // 调整：体积放大至 1.7 倍
         
         enemies.push({
             x: Math.random() * (canvas.width - specialSize),
             y: -specialSize,
             size: specialSize,
-            speed: 7.0 + Math.random() * 2.5, // 极大增强速度 (7.0 - 9.5)
+            speed: 8.5 + Math.random() * 2.5, // 调整：再次提速 (8.5 - 11.0)
             status: 'alive',
             hitTimer: 0,
-            isSpecial: true // 独家打上Boss标签
+            isSpecial: true
         });
     }
 
-    // 🎯 核心新增：控制顶部78分提示弹窗展示
+    // 🎯 控制顶部78分提示弹窗展示
     function triggerSpecialPopup() {
         const popup = document.getElementById('special-popup');
         popup.style.display = 'block';
@@ -575,7 +577,7 @@
         if(popupTimer) clearTimeout(popupTimer);
         popupTimer = setTimeout(() => {
             popup.style.display = 'none';
-        }, 1500); // 1.5秒后自动隐退
+        }, 1500); 
     }
 
     function gameLoop() {
@@ -607,7 +609,7 @@
             if (enemy.status === 'alive') {
                 enemy.y += enemy.speed;
                 
-                // 🎯 根据类别绘制普通图片或专属特殊贴图
+                // 根据类别绘制普通图片或专属特殊贴图
                 if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
                 } else {
@@ -638,7 +640,7 @@
                         
                         enemy.status = 'hit';
                         
-                        // 🎯 判定加分：普通+10，特殊Boss击中+78分并爆出中上横幅
+                        // 判定加分：普通+10，特殊Boss击中+78分并爆出中上横幅
                         if(enemy.isSpecial) {
                             score += 78;
                             triggerSpecialPopup();
@@ -652,7 +654,13 @@
                     }
                 }
             } else if (enemy.status === 'hit') {
-                ctx.drawImage(imgHit, enemy.x, enemy.y, enemy.size, enemy.size);
+                // 🎯 核心调整：根据是否是特殊炮弹，渲染不同的爆炸受击效果图
+                if(enemy.isSpecial) {
+                    ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
+                } else {
+                    ctx.drawImage(imgHit, enemy.x, enemy.y, enemy.size, enemy.size);
+                }
+                
                 enemy.hitTimer++;
                 if (enemy.hitTimer > 5) { enemies.splice(i, 1); }
             }
@@ -676,7 +684,7 @@
         document.getElementById('score-val').innerText = score;
         document.getElementById('time-val').innerText = timeLeft;
 
-        // 🎯 算法：每次开局保底决定出1到2个特殊怪物，并随机构建发生秒数时间表
+        // 算法：每次开局保底决定出1到2个特殊怪物，并随机构建发生秒数时间表
         specialSpawnSeconds = [];
         const spawnCount = Math.floor(Math.random() * 2) + 1; // 纯正随机 1 或 2 
         while(specialSpawnSeconds.length < spawnCount) {
@@ -694,7 +702,6 @@
             timeLeft--;
             document.getElementById('time-val').innerText = timeLeft;
             
-            // 🎯 在精确的时间刻度点上发射特殊危机物
             if(specialSpawnSeconds.includes(timeLeft)) {
                 triggerSpecialSpawn();
             }
@@ -717,7 +724,7 @@
         
         if (reason === 'hit') {
             document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
-            descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
+            descElement.innerHTML = `很遗憾，你被小飞机击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
             document.getElementById('overlay-title').innerHTML = "时间到<br>完美生还！";
             descElement.innerHTML = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br><br>最终统计算分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
@@ -730,4 +737,4 @@
     switchMode('mobile');
 </script>
 </body>
-</html>
+                    </html>
