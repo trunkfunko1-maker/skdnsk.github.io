@@ -629,7 +629,6 @@
         popupTimer = setTimeout(() => { popup.style.display = 'none'; }, 1500); 
     }
 
-    // 💡 提取绘制静态游戏画面的函数，供常规与爆炸定格状态复用
     function drawStaticScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
@@ -646,8 +645,7 @@
         for (let enemy of enemies) {
             if (enemy.status === 'alive') {
                 if (enemy.isBomb) {
-                    // 💡 如果是炸弹，且当前处于爆炸过程中，则让其立刻消失（不执行绘制）
-                    if (isBombExploding) continue;
+                    if (isBombExploding) continue; // 炸弹爆炸瞬间隐藏其本体贴图
                     drawBombEnemy(enemy);
                 } else if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
@@ -655,7 +653,7 @@
                     ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
                 }
             } else if (enemy.status === 'hit') {
-                // 💡 击中后瞬间变化贴图，并在原地保持不动
+                // 击中瞬间切换新贴图
                 if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
                 } else {
@@ -668,12 +666,10 @@
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 炸弹爆炸且原有画面完全保持静止的逻辑分支
+        // 💥 炸弹爆炸定格逻辑
         if (isBombExploding) {
-            // 💡 渲染被冻结的战场（此时炸弹自身已经被上面的过滤逻辑隐藏，不再显示）
             drawStaticScene();
 
-            // 在静止画面上单独更新渲染火星飞溅
             for (let i = bombExplosionParticles.length - 1; i >= 0; i--) {
                 let p = bombExplosionParticles[i];
                 p.x += p.vx;
@@ -712,13 +708,12 @@
             return;
         }
 
-        // 常规运行状态：更新玩家移动
+        // 常规更新
         if (keys.up && player.y > 0) player.y -= player.speed;
         if (keys.down && player.y < canvas.height - player.size) player.y += player.speed;
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        // 更新常规非定格元素的数据
         for (let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
             b.y -= b.speed;
@@ -731,14 +726,14 @@
             let enemy = enemies[i];
 
             if (enemy.status === 'alive') {
-                enemy.y += enemy.speed; // 只有活着的时候才会向下移动
+                enemy.y += enemy.speed;
 
                 if (enemy.y > canvas.height) {
                     enemies.splice(i, 1);
                     continue;
                 }
 
-                // 战机撞击物体
+                // 碰撞检测
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
@@ -753,7 +748,7 @@
                     return; 
                 }
 
-                // 子弹击中物体
+                // 子弹击中
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -770,9 +765,9 @@
                             return; 
                         }
                         
-                        // 触发击中：贴图瞬间变换
+                        // 触发击中状态
                         enemy.status = 'hit';
-                        enemy.hitTimer = 0; // 重置计时器
+                        enemy.hitTimer = 0;
                         
                         if(enemy.isSpecial) {
                             score += 78;
@@ -785,16 +780,15 @@
                     }
                 }
             } else if (enemy.status === 'hit') {
-                // 💡 处于被击中状态时，enemy.y 不再累加（保持原地停留），开始累加计时
+                // 原地静止并累加帧数
                 enemy.hitTimer++;
-                // 💡 0.8秒在60帧运行下约为48帧 (60 * 0.8 = 48)
-                if (enemy.hitTimer >= 48) { 
+                // 💡 0.3 秒在 60 帧下约为 18 帧 (60 * 0.3 = 18)
+                if (enemy.hitTimer >= 18) { 
                     enemies.splice(i, 1); 
                 }
             }
         }
 
-        // 全局绘制
         drawStaticScene();
         requestAnimationFrame(gameLoop);
     }
@@ -880,4 +874,4 @@
     switchMode('mobile');
 </script>
 </body>
-    </html>
+</html>
