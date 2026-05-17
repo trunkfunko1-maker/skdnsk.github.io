@@ -629,23 +629,25 @@
         popupTimer = setTimeout(() => { popup.style.display = 'none'; }, 1500); 
     }
 
-    // 💡 单独提取绘制静态游戏画面的函数，用于在爆炸状态下保持静止画面
+    // 💡 提取绘制静态游戏画面的函数，供常规与爆炸定格状态复用
     function drawStaticScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 绘制战机
+        // 1. 绘制战机
         drawFighter(player.x, player.y, player.size);
         
-        // 绘制子弹
+        // 2. 绘制子弹
         for (let b of bullets) {
             ctx.fillStyle = '#fff200';
             ctx.fillRect(b.x, b.y, b.width, b.height);
         }
         
-        // 绘制所有存活的常规、特殊或炸弹敌机
+        // 3. 绘制所有敌机
         for (let enemy of enemies) {
             if (enemy.status === 'alive') {
                 if (enemy.isBomb) {
+                    // 💡 如果是炸弹，且当前处于爆炸过程中，则让其立刻消失（不执行绘制）
+                    if (isBombExploding) continue;
                     drawBombEnemy(enemy);
                 } else if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
@@ -653,6 +655,7 @@
                     ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
                 }
             } else if (enemy.status === 'hit') {
+                // 💡 击中后瞬间变化贴图，并在原地保持不动
                 if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
                 } else {
@@ -665,12 +668,12 @@
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 火星四射且原有画面完全保持静止的独立逻辑分支
+        // 💥 炸弹爆炸且原有画面完全保持静止的逻辑分支
         if (isBombExploding) {
-            // 💡 核心改动：不再清除屏幕，也不使用纯黑半透明覆盖。直接每帧重绘静止画面，确保其余元素不消失、不淡化
+            // 💡 渲染被冻结的战场（此时炸弹自身已经被上面的过滤逻辑隐藏，不再显示）
             drawStaticScene();
 
-            // 在完全静止的战场画面上，单独叠加更新并渲染火星飞溅
+            // 在静止画面上单独更新渲染火星飞溅
             for (let i = bombExplosionParticles.length - 1; i >= 0; i--) {
                 let p = bombExplosionParticles[i];
                 p.x += p.vx;
@@ -709,37 +712,26 @@
             return;
         }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+        // 常规运行状态：更新玩家移动
         if (keys.up && player.y > 0) player.y -= player.speed;
         if (keys.down && player.y < canvas.height - player.size) player.y += player.speed;
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        drawFighter(player.x, player.y, player.size);
-
+        // 更新常规非定格元素的数据
         for (let i = bullets.length - 1; i >= 0; i--) {
             let b = bullets[i];
             b.y -= b.speed;
-            ctx.fillStyle = '#fff200';
-            ctx.fillRect(b.x, b.y, b.width, b.height);
             if(b.y < 0) bullets.splice(i, 1);
         }
 
         spawnEnemy();
+
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
 
             if (enemy.status === 'alive') {
-                enemy.y += enemy.speed;
-                
-                if (enemy.isBomb) {
-                    drawBombEnemy(enemy);
-                } else if(enemy.isSpecial) {
-                    ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
-                } else {
-                    ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
-                }
+                enemy.y += enemy.speed; // 只有活着的时候才会向下移动
 
                 if (enemy.y > canvas.height) {
                     enemies.splice(i, 1);
@@ -778,7 +770,10 @@
                             return; 
                         }
                         
+                        // 触发击中：贴图瞬间变换
                         enemy.status = 'hit';
+                        enemy.hitTimer = 0; // 重置计时器
+                        
                         if(enemy.isSpecial) {
                             score += 78;
                             triggerSpecialPopup();
@@ -790,16 +785,17 @@
                     }
                 }
             } else if (enemy.status === 'hit') {
-                if(enemy.isSpecial) {
-                    ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
-                } else {
-                    ctx.drawImage(imgHit, enemy.x, enemy.y, enemy.size, enemy.size);
-                }
+                // 💡 处于被击中状态时，enemy.y 不再累加（保持原地停留），开始累加计时
                 enemy.hitTimer++;
-                if (enemy.hitTimer > 5) { enemies.splice(i, 1); }
+                // 💡 0.8秒在60帧运行下约为48帧 (60 * 0.8 = 48)
+                if (enemy.hitTimer >= 48) { 
+                    enemies.splice(i, 1); 
+                }
             }
         }
 
+        // 全局绘制
+        drawStaticScene();
         requestAnimationFrame(gameLoop);
     }
 
@@ -884,4 +880,4 @@
     switchMode('mobile');
 </script>
 </body>
-</html>
+    </html>
