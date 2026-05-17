@@ -480,7 +480,6 @@
         ctx.restore();
     }
 
-    // 💣 绘制伪装炸弹飞机
     function drawBombEnemy(enemy) {
         ctx.save();
         ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
@@ -496,7 +495,6 @@
         ctx.restore();
     }
 
-    // 🎇 创建炸弹“火星四射”颗粒动画
     function createBombExplosion(x, y) {
         bombExplosionParticles = [];
         isBombExploding = true;
@@ -645,7 +643,7 @@
         for (let enemy of enemies) {
             if (enemy.status === 'alive') {
                 if (enemy.isBomb) {
-                    if (isBombExploding) continue; // 炸弹爆炸瞬间隐藏其本体贴图
+                    if (isBombExploding) continue; 
                     drawBombEnemy(enemy);
                 } else if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
@@ -653,7 +651,6 @@
                     ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
                 }
             } else if (enemy.status === 'hit') {
-                // 击中瞬间切换新贴图
                 if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
                 } else {
@@ -782,8 +779,11 @@
             } else if (enemy.status === 'hit') {
                 // 原地静止并累加帧数
                 enemy.hitTimer++;
-                // 💡 0.3 秒在 60 帧下约为 18 帧 (60 * 0.3 = 18)
-                if (enemy.hitTimer >= 18) { 
+                
+                // 💡 针对不同类型的敌机区分停留判定帧数
+                let maxFreezeFrames = enemy.isSpecial ? 18 : 6; // 特殊Boss保持18帧(0.3秒)，普通敌机改为6帧(0.1秒)
+                
+                if (enemy.hitTimer >= maxFreezeFrames) { 
                     enemies.splice(i, 1); 
                 }
             }
