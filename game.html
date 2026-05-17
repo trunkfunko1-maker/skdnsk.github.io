@@ -173,12 +173,21 @@
             width: 100%;
         }
 
+        /* 默认主页和通关大标题的基础样式 */
         .overlay h2 { 
             margin-bottom: 15px; 
             font-size: 28px; 
             color: #ff4757; 
             line-height: 1.4; 
         }
+        
+        /* 通关成功时的绿色加亮专属样式 */
+        .overlay h2.success-title {
+            color: #2ed573;
+            text-shadow: 0 0 15px rgba(46, 213, 115, 0.6), 0 0 30px rgba(46, 213, 115, 0.2);
+            font-weight: 900;
+        }
+
         .overlay p { margin-bottom: 20px; font-size: 14px; color: #ccc; line-height: 1.6; }
 
         /* 选项按钮行 */
@@ -293,7 +302,6 @@
 </head>
 <body>
 
-    <!-- 游戏主容器 -->
     <div id="wrapper">
         <div id="status-bar">
             <div class="sb-left">
@@ -308,10 +316,8 @@
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
             
-            <!-- 特殊击中横幅弹窗 -->
             <div id="special-popup">恭喜你已拿下怪物鸡巴！<span class="popup-highlight">分数+78</span></div>
             
-            <!-- 遮罩层主界面 -->
             <div id="overlay" class="overlay">
                 <div class="overlay-content">
                     <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
@@ -325,12 +331,10 @@
                     <button id="start-btn" class="main-btn" onclick="startGame()">开始游戏</button>
                 </div>
 
-                <!-- 确保手机端绝对可见的底部灰色版权 -->
                 <div class="overlay-footer">© 2026 川大附中天堂网出品</div>
             </div>
         </div>
 
-        <!-- 📱 手机端控制区 -->
         <div id="mobile-controller">
             <div class="dpad-horizontal">
                 <button class="ctrl-btn" id="btn-left">◀</button>
@@ -544,16 +548,16 @@
         }
     }
 
-    // 🎯 核心调整：增大特殊炮弹尺寸，并降低移动速度
+    // 🎯 核心调整：将特殊炮弹的速度调整为固定的 6.0
     function triggerSpecialSpawn() {
         const baseSize = currentDeviceMode === 'pc' ? 65 : 60;
-        const specialSize = baseSize * 2.4; // 体积大幅提升至 2.4 倍，更加巨大
+        const specialSize = baseSize * 2.4; 
         
         enemies.push({
             x: Math.random() * (canvas.width - specialSize),
             y: -specialSize,
             size: specialSize,
-            speed: 2.0 + Math.random() * 1.5, // 速度降低至 2.0 ~ 3.5，缓慢推进
+            speed: 6.0, // 固定速度为 6.0
             status: 'alive',
             hitTimer: 0,
             isSpecial: true
@@ -701,14 +705,17 @@
         keys.left = false; keys.right = false; keys.up = false; keys.down = false;
         activePointers = {};
 
+        const titleElement = document.getElementById('overlay-title');
         const descElement = document.getElementById('overlay-desc');
         document.getElementById('selector-box').style.display = 'flex'; 
         
         if (reason === 'hit') {
-            document.getElementById('overlay-title').innerHTML = "战机坠毁<br>游戏结束！";
+            titleElement.classList.remove('success-title'); 
+            titleElement.innerHTML = "战机坠毁<br>游戏结束！";
             descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
-            document.getElementById('overlay-title').innerHTML = "时间到<br>完美生还！";
+            titleElement.classList.add('success-title'); 
+            titleElement.innerHTML = "时间到<br>完美生还！";
             descElement.innerHTML = `恭喜你在猛烈攻势下撑过了 30 秒！🏆<br><br>最终统计算分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         }
         
@@ -719,4 +726,4 @@
     switchMode('mobile');
 </script>
 </body>
-</html>
+    </html>
