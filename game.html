@@ -11,6 +11,7 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: none; /* 禁用系统默认缩放和双击，提升触控响应速度 */
         }
         body {
             background: linear-gradient(135deg, #0f0c20 0%, #15102a 100%);
@@ -177,10 +178,10 @@
             bottom: 30px;
             left: 0;
             width: 100%;
-            padding: 0 20px;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             pointer-events: none; 
             z-index: 8;
             transition: opacity 0.3s ease;
@@ -189,14 +190,10 @@
             display: none !important;
         }
 
-        /* 十字键 */
-        .dpad {
-            position: relative;
-            width: 140px;
-            height: 140px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+        /* 📱 仅保留左右方向键的扁平化操作盘 */
+        .dpad-horizontal {
+            display: flex;
+            gap: 12px;
             pointer-events: auto;
         }
         .ctrl-btn {
@@ -204,34 +201,32 @@
             color: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            font-size: 20px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
+            width: 65px;
+            height: 65px;
+            touch-action: none;
         }
         .ctrl-btn:active {
             background: rgba(255, 255, 255, 0.4);
             color: #fff;
         }
-        #btn-up { grid-column: 2; border-bottom: none; border-radius: 12px 12px 0 0; }
-        #btn-left { grid-column: 1; grid-row: 2; border-right: none; border-radius: 12px 0 0 12px; }
-        .dpad-center { grid-column: 2; grid-row: 2; background: rgba(255, 255, 255, 0.1); border: none; }
-        #btn-right { grid-column: 3; grid-row: 2; border-left: none; border-radius: 0 12px 12px 0; }
-        #btn-down { grid-column: 2; grid-row: 3; border-top: none; border-radius: 0 0 12px 12px; }
 
-        /* 开火键 */
+        /* 开火键区 */
         .fire-sector {
             pointer-events: auto;
         }
         #btn-fire {
-            width: 85px;
-            height: 85px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: rgba(255, 71, 87, 0.6);
             color: white;
-            font-size: 32px;
+            font-size: 30px;
             border: 2px solid rgba(255, 71, 87, 0.8);
             box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
         }
@@ -270,13 +265,11 @@
             </div>
         </div>
 
+        <!-- 📱 手机端控制区（仅包含左右和火球） -->
         <div id="mobile-controller">
-            <div class="dpad">
-                <button class="ctrl-btn" id="btn-up">▲</button>
+            <div class="dpad-horizontal">
                 <button class="ctrl-btn" id="btn-left">◀</button>
-                <div class="dpad-center"></div>
                 <button class="ctrl-btn" id="btn-right">▶</button>
-                <button class="ctrl-btn" id="btn-down">▼</button>
             </div>
 
             <div class="fire-sector">
@@ -312,17 +305,19 @@
             wrapper.classList.add('pc-mode');
             btnPC.classList.add('active');
             btnMobile.classList.remove('active');
-            descText.innerHTML = "【电脑端控制指南】<br>移动：键盘 WASD 键 或 方向键<br>开火：空格键 或 J 键<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
-            player.size = 46; // 略微放大战机尺寸适配大屏幕
+            descText.innerHTML = "【电脑端控制指南】<br>移动：键盘 A、D 键 或 ◀ ▶ 方向键<br>开火：空格键 或 J 键<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
+            player.size = 46; 
             player.speed = 7;
         } else {
             wrapper.classList.remove('pc-mode');
             btnMobile.classList.add('active');
             btnPC.classList.remove('active');
-            descText.innerHTML = "使用屏幕虚拟操作盘 或 键盘WASD控制控制机体<br>右下角红按钮或空格开火！<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
+            descText.innerHTML = "使用屏幕底部左右方向键控制机体<br>右下角红按钮开火！<br><b style='color:#ff4757;'>注意：千万不要碰到落下的炮弹！</b>";
             player.size = 40;
             player.speed = 6;
         }
+        // 重置所有按键状态以防残留
+        keys.left = false; keys.right = false; keys.up = false; keys.down = false;
         setTimeout(resizeCanvas, 50); 
     }
 
@@ -343,12 +338,12 @@
     let enemies = [];
     let keys = { up: false, down: false, left: false, right: false };
 
-    // 绘制高级小战斗机的方法
+    // 绘制高级小战斗机
     function drawFighter(x, y, size) {
         ctx.save();
         ctx.translate(x + size / 2, y + size / 2);
 
-        // 1. 动态发动机尾焰效果
+        // 1. 动态发动机尾焰
         if (Math.random() > 0.3) {
             ctx.fillStyle = Math.random() > 0.5 ? '#ff4757' : '#ffa502';
             ctx.beginPath();
@@ -359,8 +354,8 @@
             ctx.fill();
         }
 
-        // 2. 主翼 (两侧的大机翼)
-        ctx.fillStyle = '#26af5f'; // 深绿色主翼底色
+        // 2. 主翼
+        ctx.fillStyle = '#26af5f'; 
         ctx.beginPath();
         ctx.moveTo(0, -size / 4);
         ctx.lineTo(-size / 2, size / 4);
@@ -368,23 +363,23 @@
         ctx.closePath();
         ctx.fill();
 
-        // 3. 主机身 (中央流线躯干)
-        ctx.fillStyle = '#2ed573'; // 亮绿色机身
+        // 3. 主机身
+        ctx.fillStyle = '#2ed573'; 
         ctx.beginPath();
-        ctx.moveTo(0, -size / 2);         // 机头尖端
-        ctx.lineTo(-size / 6, -size / 6);  // 左前侧
-        ctx.lineTo(-size / 8, size / 2);   // 左后尾
-        ctx.lineTo(size / 8, size / 2);    // 右后尾
-        ctx.lineTo(size / 6, -size / 6);   // 右前侧
+        ctx.moveTo(0, -size / 2);         
+        ctx.lineTo(-size / 6, -size / 6);  
+        ctx.lineTo(-size / 8, size / 2);   
+        ctx.lineTo(size / 8, size / 2);    
+        ctx.lineTo(size / 6, -size / 6);   
         ctx.closePath();
         ctx.fill();
 
-        // 4. 前翼/侧舷翼板 
+        // 4. 前翼板
         ctx.fillStyle = '#26af5f';
         ctx.fillRect(-size / 4, 0, size / 2, size / 12);
 
-        // 5. 炫酷机首与驾驶舱盖
-        ctx.fillStyle = '#00ffff'; // 科技感青色能量舱盖
+        // 5. 科技舱盖
+        ctx.fillStyle = '#00ffff'; 
         ctx.beginPath();
         ctx.moveTo(0, -size / 3);
         ctx.lineTo(-size / 12, -size / 8);
@@ -392,7 +387,7 @@
         ctx.closePath();
         ctx.fill();
 
-        // 6. 尾翼装饰线
+        // 6. 尾翼线
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -403,7 +398,7 @@
         ctx.restore();
     }
 
-    // 键盘监听
+    // 键盘监听（电脑端保留上下键支持自由飞行，手机端仅开放左右）
     window.addEventListener('keydown', e => {
         if(!isPlaying) return;
         if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = true;
@@ -419,22 +414,46 @@
         if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    // 触控监听
-    function setupMobileControl(btnId, direction) {
+    // 🛠️ 极其关键的Bug修复区：使用 PointerEvents 全局状态安全管理机制
+    let activePointers = {}; // 用于跟踪触屏指针ID与方向的映射
+
+    function setupSafeControl(btnId, direction) {
         const btn = document.getElementById(btnId);
-        btn.addEventListener('touchstart', (e) => {
-            if (direction === 'fire') { fireBullet(); } else { keys[direction] = true; }
-        });
-        btn.addEventListener('touchend', (e) => {
-            if (direction !== 'fire') { keys[direction] = false; }
+        
+        btn.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            if(!isPlaying) return;
+            
+            if (direction === 'fire') {
+                fireBullet();
+            } else {
+                // 绑定当前触控点ID到对应的移动方向
+                activePointers[e.pointerId] = direction;
+                keys[direction] = true;
+                btn.setPointerCapture(e.pointerId); // 锁定核心捕获，手指划出外面也能正常接收事件
+            }
         });
     }
 
-    setupMobileControl('btn-up', 'up');
-    setupMobileControl('btn-down', 'down');
-    setupMobileControl('btn-left', 'left');
-    setupMobileControl('btn-right', 'right');
-    setupMobileControl('btn-fire', 'fire');
+    // 全局防卡死释放监听：无论在哪个角落松手、断开或移出边缘，都绝对强制重置移动状态
+    window.addEventListener('pointerup', (e) => {
+        const boundDirection = activePointers[e.pointerId];
+        if (boundDirection) {
+            keys[boundDirection] = false;
+            delete activePointers[e.pointerId];
+        }
+    });
+    window.addEventListener('pointercancel', (e) => {
+        const boundDirection = activePointers[e.pointerId];
+        if (boundDirection) {
+            keys[boundDirection] = false;
+            delete activePointers[e.pointerId];
+        }
+    });
+
+    setupSafeControl('btn-left', 'left');
+    setupSafeControl('btn-right', 'right');
+    setupSafeControl('btn-fire', 'fire');
 
     function fireBullet() {
         if(!isPlaying) return;
@@ -467,12 +486,12 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // 电脑端游玩支持全向移动，手机端默认锁定在底部靠下横向平移
         if (keys.up && player.y > 0) player.y -= player.speed;
         if (keys.down && player.y < canvas.height - player.size) player.y += player.speed;
         if (keys.left && player.x > 0) player.x -= player.speed;
         if (keys.right && player.x < canvas.width - player.size) player.x += player.speed;
 
-        // 🎯 核心变更点：调用全新的小战斗机绘制方法代替原本的单纯三角形指针
         drawFighter(player.x, player.y, player.size);
 
         // 子弹
@@ -539,7 +558,7 @@
         bullets = [];
         enemies = [];
         player.x = canvas.width / 2 - player.size / 2;
-        player.y = canvas.height * 0.78;
+        player.y = canvas.height * 0.82; // 稍微向下调整了战机初始高度，避开视线
         
         document.getElementById('score-val').innerText = score;
         document.getElementById('time-val').innerText = timeLeft;
@@ -559,6 +578,10 @@
         isPlaying = false;
         clearInterval(countdownInterval);
         
+        // 游戏结束强制清空方向键，杜绝重生后自动乱飞的诡异表现
+        keys.left = false; keys.right = false; keys.up = false; keys.down = false;
+        activePointers = {};
+
         const descElement = document.getElementById('overlay-desc');
         document.getElementById('selector-box').style.display = 'flex'; 
         
