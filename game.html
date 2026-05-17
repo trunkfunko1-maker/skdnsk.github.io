@@ -188,6 +188,13 @@
             font-weight: 900;
         }
 
+        /* 💡 新增：炸弹爆炸专属加亮样式 */
+        .overlay h2.bomb-title {
+            color: #ff3838;
+            text-shadow: 0 0 20px rgba(255, 56, 56, 0.8), 0 0 40px rgba(255, 56, 56, 0.4);
+            font-weight: 900;
+        }
+
         .overlay p { margin-bottom: 20px; font-size: 14px; color: #ccc; line-height: 1.6; }
 
         /* 选项按钮行 */
@@ -302,6 +309,7 @@
 </head>
 <body>
 
+    <!-- 游戏主容器 -->
     <div id="wrapper">
         <div id="status-bar">
             <div class="sb-left">
@@ -316,8 +324,10 @@
         <div id="canvas-container">
             <canvas id="gameCanvas"></canvas>
             
+            <!-- 特殊击中横幅弹窗 -->
             <div id="special-popup">恭喜你已拿下怪物鸡巴！<span class="popup-highlight">分数+78</span></div>
             
+            <!-- 遮罩层主界面 -->
             <div id="overlay" class="overlay">
                 <div class="overlay-content">
                     <h2 id="overlay-title">王茂钢打飞机<br>大作战</h2>
@@ -331,10 +341,12 @@
                     <button id="start-btn" class="main-btn" onclick="startGame()">开始游戏</button>
                 </div>
 
+                <!-- 确保手机端绝对可见的底部灰色版权 -->
                 <div class="overlay-footer">© 2026 川大附中天堂网出品</div>
             </div>
         </div>
 
+        <!-- 📱 手机端控制区 -->
         <div id="mobile-controller">
             <div class="dpad-horizontal">
                 <button class="ctrl-btn" id="btn-left">◀</button>
@@ -412,8 +424,13 @@
     let keys = { up: false, down: false, left: false, right: false };
     
     let specialSpawnSeconds = [];
+    let bombSpawnSeconds = []; // 💣 存放炸弹生成的秒数
 
-    // 绘制小战斗机
+    // 🎇 炸弹粒子效果系统设定
+    let bombExplosionParticles = [];
+    let isBombExploding = false;
+    let bombExplosionTimer = 0;
+
     function drawFighter(x, y, size) {
         ctx.save();
         ctx.translate(x + size / 2, y + size / 2);
@@ -467,9 +484,46 @@
         ctx.restore();
     }
 
+    // 💣 绘制炸弹飞机（底层加载原版贴图，上层叠加警告符号以资区别）
+    function drawBombEnemy(enemy) {
+        ctx.save();
+        ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
+        // 在中间叠加一个黑红色的闪烁骷髅或警告感叹号
+        if (Math.floor(Date.now() / 150) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+            ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+        }
+        ctx.fillStyle = '#ff3838';
+        ctx.font = `bold ${enemy.size * 0.4}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', enemy.x + enemy.size / 2, enemy.y + enemy.size / 2);
+        ctx.restore();
+    }
+
+    // 创建炸弹爆炸粒子
+    function createBombExplosion(x, y) {
+        bombExplosionParticles = [];
+        isBombExploding = true;
+        bombExplosionTimer = 45; // 持续约 45 帧动画
+        
+        for (let i = 0; i < 60; i++) {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = 2 + Math.random() * 8;
+            bombExplosionParticles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: 3 + Math.random() * 6,
+                color: Math.random() > 0.4 ? (Math.random() > 0.5 ? '#ff3838' : '#ff9f43') : '#ffffff'
+            });
+        }
+    }
+
     // 键盘监听
     window.addEventListener('keydown', e => {
-        if(!isPlaying) return;
+        if(!isPlaying || isBombExploding) return;
         if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.up = true;
         if(e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.down = true;
         if(e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
@@ -490,7 +544,7 @@
         
         btn.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            if(!isPlaying) return;
+            if(!isPlaying || isBombExploding) return;
             
             if (direction === 'fire') {
                 fireBullet();
@@ -522,7 +576,7 @@
     setupSafeControl('btn-fire', 'fire');
 
     function fireBullet() {
-        if(!isPlaying) return;
+        if(!isPlaying || isBombExploding) return;
         bullets.push({ 
             x: player.x + player.size / 2 - 3, 
             y: player.y, 
@@ -543,12 +597,12 @@
                 speed: 3.0 + Math.random() * 3.5,
                 status: 'alive', 
                 hitTimer: 0,
-                isSpecial: false     
+                isSpecial: false,
+                isBomb: false     
             });
         }
     }
 
-    // 🎯 核心调整：将特殊炮弹的速度调整为固定的 6.0
     function triggerSpecialSpawn() {
         const baseSize = currentDeviceMode === 'pc' ? 65 : 60;
         const specialSize = baseSize * 2.4; 
@@ -557,10 +611,26 @@
             x: Math.random() * (canvas.width - specialSize),
             y: -specialSize,
             size: specialSize,
-            speed: 6.0, // 固定速度为 6.0
+            speed: 6.0, 
             status: 'alive',
             hitTimer: 0,
-            isSpecial: true
+            isSpecial: true,
+            isBomb: false
+        });
+    }
+
+    // 💣 触发炸弹生成（大小速度与普通飞机完全一致）
+    function triggerBombSpawn() {
+        const enemySize = currentDeviceMode === 'pc' ? 65 : 60; 
+        enemies.push({
+            x: Math.random() * (canvas.width - enemySize),
+            y: -enemySize,
+            size: enemySize,
+            speed: 3.0 + Math.random() * 3.5, // 速度与普通敌机一致
+            status: 'alive',
+            hitTimer: 0,
+            isSpecial: false,
+            isBomb: true
         });
     }
 
@@ -576,6 +646,35 @@
 
     function gameLoop() {
         if(!isPlaying) return;
+
+        // 如果目前正在播放炸弹大爆炸动画
+        if (isBombExploding) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制并更新炸弹粒子
+            for (let i = bombExplosionParticles.length - 1; i >= 0; i--) {
+                let p = bombExplosionParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.96;
+                p.vy *= 0.96;
+                
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            bombExplosionTimer--;
+            if (bombExplosionTimer <= 0) {
+                isBombExploding = false;
+                endGame('bomb'); // 动画演示完毕后直接进游戏结束
+                return;
+            }
+            requestAnimationFrame(gameLoop);
+            return;
+        }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -601,7 +700,9 @@
             if (enemy.status === 'alive') {
                 enemy.y += enemy.speed;
                 
-                if(enemy.isSpecial) {
+                if (enemy.isBomb) {
+                    drawBombEnemy(enemy);
+                } else if(enemy.isSpecial) {
                     ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
                 } else {
                     ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
@@ -612,14 +713,21 @@
                     continue;
                 }
 
+                // 玩家战机撞上任何炮弹/飞机
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
                     player.y + player.size > enemy.y) {
-                    endGame('hit'); 
+                    if (enemy.isBomb) {
+                        clearInterval(countdownInterval);
+                        createBombExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
+                    } else {
+                        endGame('hit'); 
+                    }
                     return; 
                 }
 
+                // 子弹检测
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -627,8 +735,16 @@
                         bullet.y < enemy.y + enemy.size &&
                         bullet.y + bullet.height > enemy.y) {
                         
-                        enemy.status = 'hit';
+                        bullets.splice(j, 1);
+
+                        if (enemy.isBomb) {
+                            // 💥 击中炸弹，立刻开始大爆炸暂停动画，不结算分数
+                            clearInterval(countdownInterval);
+                            createBombExplosion(enemy.x + enemy.size/2, enemy.y + enemy.size/2);
+                            return; 
+                        }
                         
+                        enemy.status = 'hit';
                         if(enemy.isSpecial) {
                             score += 78;
                             triggerSpecialPopup();
@@ -637,7 +753,6 @@
                         }
                         
                         document.getElementById('score-val').innerText = score;
-                        bullets.splice(j, 1);
                         break; 
                     }
                 }
@@ -665,18 +780,31 @@
         timeLeft = 30;
         bullets = [];
         enemies = [];
+        isBombExploding = false;
+        bombExplosionParticles = [];
         player.x = canvas.width / 2 - player.size / 2;
         player.y = canvas.height * 0.82; 
         
         document.getElementById('score-val').innerText = score;
         document.getElementById('time-val').innerText = timeLeft;
 
+        // 随机特殊敌机时间 (1~2个)
         specialSpawnSeconds = [];
         const spawnCount = Math.floor(Math.random() * 2) + 1; 
         while(specialSpawnSeconds.length < spawnCount) {
             let targetSecond = Math.floor(Math.random() * 20) + 5; 
             if(!specialSpawnSeconds.includes(targetSecond)) {
                 specialSpawnSeconds.push(targetSecond);
+            }
+        }
+
+        // 💣 随机生成炸弹飞机的秒数 (出现0-2次)
+        bombSpawnSeconds = [];
+        const bombCount = Math.floor(Math.random() * 3); // 获得 0, 1 或 2 次
+        while(bombSpawnSeconds.length < bombCount) {
+            let bombSecond = Math.floor(Math.random() * 22) + 4;
+            if(!specialSpawnSeconds.includes(bombSecond) && !bombSpawnSeconds.includes(bombSecond)) {
+                bombSpawnSeconds.push(bombSecond);
             }
         }
         
@@ -690,6 +818,10 @@
             
             if(specialSpawnSeconds.includes(timeLeft)) {
                 triggerSpecialSpawn();
+            }
+
+            if(bombSpawnSeconds.includes(timeLeft)) {
+                triggerBombSpawn(); // 💣 出发炸弹轰炸
             }
 
             if(timeLeft <= 0) { endGame('timeout'); }
@@ -709,8 +841,15 @@
         const descElement = document.getElementById('overlay-desc');
         document.getElementById('selector-box').style.display = 'flex'; 
         
-        if (reason === 'hit') {
-            titleElement.classList.remove('success-title'); 
+        // 移除非当前状态的类名
+        titleElement.classList.remove('success-title', 'bomb-title');
+
+        if (reason === 'bomb') {
+            // 💣 炸弹击中结束逻辑
+            titleElement.classList.add('bomb-title'); // 红色加亮
+            titleElement.innerHTML = "炸弹爆炸<br>游戏结束！";
+            descElement.innerHTML = `噢不！你误击了高危炸弹炮弹！💥<br>核能冲击波已瞬间摧毁整台战机。`; // 不显示分数统算
+        } else if (reason === 'hit') {
             titleElement.innerHTML = "战机坠毁<br>游戏结束！";
             descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
