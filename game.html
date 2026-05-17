@@ -40,10 +40,10 @@
             overflow: hidden;
         }
 
-        /* 🖥️ 电脑端网页动态样式扩展（已调窄并拉长，比例更完美） */
+        /* 🖥️ 电脑端网页动态样式扩展 */
         #wrapper.pc-mode {
-            max-width: 540px; /* 从800px调窄至540px */
-            max-height: 720px; /* 从600px加长至720px */
+            max-width: 540px; 
+            max-height: 720px; 
             height: 720px;
             border: 4px solid #3d346d;
             border-radius: 12px;
@@ -356,7 +356,7 @@
         </div>
     </div>
 
-<script>
+<script {sandbox="allow-scripts"}>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('canvas-container');
@@ -629,14 +629,48 @@
         popupTimer = setTimeout(() => { popup.style.display = 'none'; }, 1500); 
     }
 
+    // 💡 单独提取绘制静态游戏画面的函数，用于在爆炸状态下保持静止画面
+    function drawStaticScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 绘制战机
+        drawFighter(player.x, player.y, player.size);
+        
+        // 绘制子弹
+        for (let b of bullets) {
+            ctx.fillStyle = '#fff200';
+            ctx.fillRect(b.x, b.y, b.width, b.height);
+        }
+        
+        // 绘制所有存活的常规、特殊或炸弹敌机
+        for (let enemy of enemies) {
+            if (enemy.status === 'alive') {
+                if (enemy.isBomb) {
+                    drawBombEnemy(enemy);
+                } else if(enemy.isSpecial) {
+                    ctx.drawImage(imgSpecial, enemy.x, enemy.y, enemy.size, enemy.size);
+                } else {
+                    ctx.drawImage(imgAlive, enemy.x, enemy.y, enemy.size, enemy.size);
+                }
+            } else if (enemy.status === 'hit') {
+                if(enemy.isSpecial) {
+                    ctx.drawImage(imgSpecialHit, enemy.x, enemy.y, enemy.size, enemy.size);
+                } else {
+                    ctx.drawImage(imgHit, enemy.x, enemy.y, enemy.size, enemy.size);
+                }
+            }
+        }
+    }
+
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 火星四射：炸弹独立渲染物理系统
+        // 💥 火星四射且原有画面完全保持静止的独立逻辑分支
         if (isBombExploding) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 💡 核心改动：不再清除屏幕，也不使用纯黑半透明覆盖。直接每帧重绘静止画面，确保其余元素不消失、不淡化
+            drawStaticScene();
 
+            // 在完全静止的战场画面上，单独叠加更新并渲染火星飞溅
             for (let i = bombExplosionParticles.length - 1; i >= 0; i--) {
                 let p = bombExplosionParticles[i];
                 p.x += p.vx;
@@ -677,7 +711,6 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 战机移动边界限制（完全兼容调窄后的新画布宽度）
         if (keys.up && player.y > 0) player.y -= player.speed;
         if (keys.down && player.y < canvas.height - player.size) player.y += player.speed;
         if (keys.left && player.x > 0) player.x -= player.speed;
