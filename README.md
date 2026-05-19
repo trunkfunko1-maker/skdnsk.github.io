@@ -1,6 +1,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <script src="auth.js"></script>
     <title>我的网页</title>
     <!-- 引用外部样式表 -->
     <link rel="stylesheet" href="style.css">
