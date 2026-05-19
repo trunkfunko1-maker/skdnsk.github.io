@@ -1,41 +1,63 @@
-// auth.js - 全局唯一拦截脚本（已修正顺序 Bug）
+// auth.js - 全自动化拦截与事件绑定脚本
 (function() {
-    // 🔒 1. 配置您想设置的账号和密码
+    // 🔒 1. 在这里配置你的账号和密码
     const CORRECT_USER = "admin";
     const CORRECT_PASS = "123456";
 
-    // 🔓 2. 暴露给登录页面调用的全局登录函数
-    // 【重要修复】：必须放在最上方，确保登录页加载此脚本时能成功注册该函数
-    window.executeSiteLogin = function(username, password) {
-        if (username === CORRECT_USER && password === CORRECT_PASS) {
-            sessionStorage.setItem('site_auth_token', 'passed_successfully');
-            
-            // 读取拦截前存下的原网址，如果没有则默认跳回首页
-            let redirectUrl = sessionStorage.getItem('auth_redirect_url') || 'index.html';
-            
-            // 防止死循环：如果记录的原网址就是登录页，则强制改回首页
-            if (redirectUrl.endsWith('login.html')) {
-                redirectUrl = 'index.html';
+    // 🎯 2. 判断当前是否在登录页
+    if (window.location.pathname.endsWith('login.html')) {
+        
+        // 【核心升级】：等网页元素全部加载完后，自动接管登录页面的按钮
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('login-btn');
+            const userInput = document.getElementById('username');
+            const passInput = document.getElementById('password');
+            const errorMsg = document.getElementById('error-msg');
+
+            // 如果页面上确实有这些元素，就绑定点击和回车事件
+            if (loginBtn && userInput && passInput) {
+                
+                function doLogin() {
+                    const u = userInput.value.trim();
+                    const p = passInput.value.trim();
+
+                    if (u === CORRECT_USER && p === CORRECT_PASS) {
+                        // 验证通过，发放通行证
+                        sessionStorage.setItem('site_auth_token', 'passed_successfully');
+                        
+                        // 读出之前的原网址，如果没有则默认回首页
+                        let redirectUrl = sessionStorage.getItem('auth_redirect_url') || '/index.html';
+                        if (redirectUrl.endsWith('login.html')) {
+                            redirectUrl = '/index.html';
+                        }
+                        
+                        sessionStorage.removeItem('auth_redirect_url');
+                        window.location.href = redirectUrl; // 成功跳转
+                    } else {
+                        if (errorMsg) errorMsg.innerText = "账号或密码错误！";
+                    }
+                }
+
+                // 自动绑定点击事件
+                loginBtn.addEventListener('click', doLogin);
+                
+                // 自动绑定回车事件
+                window.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') doLogin();
+                });
             }
-            
-            sessionStorage.removeItem('auth_redirect_url'); // 擦除缓存
-            window.location.href = redirectUrl; // 跳转
-            return true;
-        }
-        return false;
-    };
+        });
 
-    // 🔒 3. 配置免密页面（如果是登录页本身，不执行后面的拦截重定向逻辑）
-    if (window.location.pathname.endsWith('login.html')) return;
+        return; // 在登录页就不执行下面的拦截逻辑了
+    }
 
-    // 🔒 4. 检查浏览器中是否有通过验证的通行证
+    // 🔒 3. 正常网页的拦截逻辑
     const isAuthed = sessionStorage.getItem('site_auth_token');
 
     if (isAuthed !== 'passed_successfully') {
-        // 没登录，记录当前想访问的页面 URL
+        // 没登录，记录当前想访问的网址
         sessionStorage.setItem('auth_redirect_url', window.location.href);
-        
-        // 强制重定向到登录页
-        window.location.href = 'login.html';
+        // 强行丢进登录页
+        window.location.href = '/login.html';
     }
 })();
