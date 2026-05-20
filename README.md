@@ -36,9 +36,13 @@
 <footer style="background: #24292e; color: white; text-align: center; padding: 20px; margin-top: 50px;">
     <p>© 2026 川大附中天堂网 </p>
     <p>
-    <a href="mailto:djkenfisao@proton.me" style="color: #58a6ff;">发送投稿</a>
+        <a href="mailto:djkenfisao@proton.me" style="color: #58a6ff;">发送投稿</a>
     </p>
     <p>
         <a href="contact.html" style="color: #58a6ff;">联系我</a>
+    </p>
+    <!-- 🔑 新增的退出登录选项 -->
+    <p>
+        <a href="javascript:void(0);" onclick="sessionStorage.removeItem('site_auth_token'); window.location.reload();" style="color: #ff4d4f; font-weight: bold; text-decoration: none;">退出登录</a>
     </p>
 </footer>
