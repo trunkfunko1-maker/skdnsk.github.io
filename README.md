@@ -1,13 +1,17 @@
+---
+layout: null
+---
 <html>
 <head>
     <meta charset="UTF-8">
-    <!-- 🔑 引入全功能核心脚本 -->
-    <script src="/auth.js?v=1"></script>
+    <!-- 🔑 加上 ?v=2 强行粉碎浏览器一切顽固缓存 -->
+    <script src="/auth.js?v=2"></script>
     <title>川大附中 天堂网</title>
+    <!-- 如果你有外部样式表可以保留，没有的话空着也行 -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 提示：此处的 body 内部不需要再手写导航栏了，脚本会自动在最顶部生成 -->
-        <div class="content">
+    <div class="content">
         # 川大附中 天堂网
         本站始终致力于维护四川大学附属中学师生的心理健康安全，努力营造良好的校园氛围。
         <div style="text-align: center; margin: 20px 0;">
@@ -18,6 +22,5 @@
         </div>
     </div>
 
-    <!-- 提示：底部也无需写 <footer>，脚本会自动在最下方追加 -->
 </body>
 </html>
