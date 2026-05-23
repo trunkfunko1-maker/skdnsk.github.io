@@ -1,12 +1,19 @@
+/* ==========================================================================
+   1. 基础布局与默认样式（小游戏页面不被干扰，直接应用此处的 GitHub 深色）
+   ========================================================================== */
+
 /* 整个页面的外边距清零，防止顶栏和边缘有缝隙 */
 body {
     margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.7;
 }
 
-/* 随页面滚动的顶栏 */
+/* 随页面正常滚动的顶栏（严格保持你原本的 relative 相对定位，不吸顶） */
 .navbar {
-    position: relative; /* 或者 static */
-    background-color: #24292e; /* 经典的 GitHub 深色 */
+    position: relative; 
+    background-color: #24292e; /* 经典的 GitHub 深灰 */
     color: white;
     padding: 1rem;
     display: flex;
@@ -16,11 +23,63 @@ body {
 .navbar a {
     color: white;
     text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+/* 鼠标悬停在默认顶栏链接上的效果 */
+.navbar a:hover {
+    color: #2ed573; /* 悬停时变为炫绿 */
 }
 
 /* 给主体内容加点高度，方便测试滚动效果 */
 .content {
-    height: 2000px;
+    min-height: 2000px;
     padding: 20px;
+    box-sizing: border-box; /* 防止 padding 撑破布局 */
 }
 
+
+/* ==========================================================================
+   2. 神秘暗黑主题皮肤（当正常页面被 auth.js 激活时，以下颜色自动覆盖上面）
+   ========================================================================== */
+
+/* 1. 改变整体网页的背景色和文字颜色（深邃星空紫、雾银字） */
+.mysterious-theme body {
+    background-color: #0d0b18;
+    color: #e2e0eb;
+}
+
+/* 2. 改变常规页面的导航栏颜色 */
+.mysterious-theme .navbar {
+    background-color: #141126; /* 更暗的紫黑 */
+    border-bottom: 1px solid #231c42;
+}
+
+/* 3. 改变常规页面的导航栏链接颜色 */
+.mysterious-theme .navbar a {
+    color: #a29bfe; /* 荧光淡紫 */
+}
+.mysterious-theme .navbar a:hover {
+    color: #2ed573; /* 悬停保持标志性炫绿 */
+}
+
+/* 4. 保证常规页面内普通超链接在暗色下的清晰阅览 */
+.mysterious-theme a {
+    color: #58a6ff;
+}
+
+/* 5. 优化常规页面内的标题颜色与分界线 */
+.mysterious-theme h1, 
+.mysterious-theme h2, 
+.mysterious-theme h3 {
+    color: #ffffff;
+    border-bottom: 1px solid #231c42;
+    padding-bottom: 8px;
+}
+
+/* 6. 柔化常规页面内的图片，防止刺眼 */
+.mysterious-theme img {
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
