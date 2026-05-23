@@ -1,17 +1,17 @@
-// auth.js - 精准手术版：权限拦截 + 登录浮窗 + 暗黑主题 + 顶底栏动态注入 + 绝不误伤自定义标题
+// auth.js - 终极防御精准版：权限拦截 + 登录浮窗 + 暗黑主题 + 顶底栏注入 + 强制后发制人（绝不误伤）
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
     const VALID_USERNAMES = ["admin32", "admin33", "admin39"];
     const WELCOME_MAP = { "admin32": "欢迎fyh", "admin33": "欢迎hxb", "admin39": "欢迎lbr" };
 
-    // 🎮 2. 游戏排除列表：只要网址包含这些词，就绝对不加载任何样式与公用顶底栏（game.html 完美安全）
+    // 🎮 2. 游戏排除列表
     const EXCLUDED_GAMES = ["game.html", "tetris", "snake"]; 
 
     // 🌌 3. 核武级地毯式暗黑 CSS
     const MYSTERIOUS_THEME_CSS = `
-        /* 🎯 精准外科手术式隐藏：只针对 GitHub Pages 默认官方主题生成的顶部横幅组件，绝不误伤用户自定义的 header 或标题 */
-        .page-header, #header_wrap, .site-header, .project-name, .project-tagline, .downloads {
+        /* 🎯 精准定点隐形：只针对官方主题特有的外壳组件，增加 .site-title 确保拦截，绝不误伤用户正文 */
+        .page-header, #header_wrap, .site-header, .site-title, .project-name, .project-tagline, .downloads {
             display: none !important;
             height: 0 !important;
             padding: 0 !important;
@@ -28,14 +28,14 @@
         }
         p, span, li, td, th, em, strong, label { color: #e2e0eb !important; }
         
-        /* 🌟 确保用户自己写的所有 H1-H6 大标题完美显现并保持高亮 */
+        /* ✨ 用户手写的所有 H1-H6 标题保持绝对安全、高亮显现 */
         h1, h2, h3, h4, h5, h6 {
             color: #ffffff !important;
             border-bottom: 1px solid #231c42 !important;
             padding-bottom: 8px;
         }
         
-        /* 顶栏公共样式美化 */
+        /* 顶栏公共样式 */
         body .navbar {
             background-color: #141126 !important;
             border-bottom: 1px solid #2a2254 !important;
@@ -70,15 +70,9 @@
         }
         body button:hover { transform: scale(1.03); }
         
-        /* 底栏特殊美化控制 */
         body footer {
-            background: #141126 !important;
-            color: white !important;
-            text-align: center !important;
-            padding: 20px !important;
-            margin-top: 50px !important;
-            border-top: 1px solid #2a2254 !important;
-            border-radius: 8px !important;
+            background: #141126 !important; color: white !important; text-align: center !important;
+            padding: 20px !important; margin-top: 50px !important; border-top: 1px solid #2a2254 !important; border-radius: 8px !important;
         }
     `;
 
@@ -86,27 +80,31 @@
     const isGame = EXCLUDED_GAMES.some(gameKeyword => currentPath.includes(gameKeyword.toLowerCase()));
     const isLoginPage = currentPath.endsWith('/login.html');
 
-    // ⚡ 4. 自动化动态注入主题样式
+    // ⚡ 4. 自动化动态注入主题样式（改用后发制人逻辑：等待 DOM 解析完再挂载到最后，防止被官方主题样式覆盖）
     if (!isGame && !isLoginPage) {
-        const styleElement = document.createElement('style');
-        styleElement.appendChild(document.createTextNode(MYSTERIOUS_THEME_CSS));
-        if (document.head) { document.head.appendChild(styleElement); } 
-        else { document.addEventListener('DOMContentLoaded', () => document.head.appendChild(styleElement)); }
+        const injectStyles = () => {
+            const styleElement = document.createElement('style');
+            styleElement.appendChild(document.createTextNode(MYSTERIOUS_THEME_CSS));
+            document.head.appendChild(styleElement);
+        };
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', injectStyles);
+        } else {
+            injectStyles();
+        }
     }
 
-    // 🚀 5. 全自动注入顶底栏 + 精准物理移除官方横幅
+    // 🚀 5. 全自动注入顶底栏 + 精准物理移除官方组件
     if (!isGame && !isLoginPage) {
         document.addEventListener('DOMContentLoaded', function() {
             
-            // 🎯 只定向粉碎 GitHub 官方生成模板的类名，绝对不碰通用的 header 标签
+            // 定向粉碎官方模板类名，不碰任何通用基础标签
             const targetKillList = [
-                '.page-header', '#header_wrap', '.site-header', '.project-name', '.project-tagline'
+                '.page-header', '#header_wrap', '.site-header', '.site-title', '.project-name', '.project-tagline'
             ];
             targetKillList.forEach(function(selector) {
                 const elements = document.querySelectorAll(selector);
-                elements.forEach(function(el) {
-                    if (el) el.remove();
-                });
+                elements.forEach(function(el) { if (el) el.remove(); });
             });
 
             // A. 构建新顶栏 HTML
@@ -118,7 +116,6 @@
                     <a href="/23.html">关于</a>
                 </div>
                 <div class="navbar">
-                    <a href="/24.html">王茂纲</a>
                     <a href="/24.html">王茂纲</a>
                     <a href="/25.html">异闻录</a>
                     <a href="/22.html">怪物鸡吧</a>
