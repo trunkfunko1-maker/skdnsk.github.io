@@ -1,4 +1,4 @@
-// auth.js - 全站一体化终极脚本：权限拦截 + 登录浮窗 + 暗黑主题 + 全局公用顶底栏动态注入
+// auth.js - 全站一体化终极脚本：权限拦截 + 登录浮窗 + 暗黑主题 + 全局公用顶底栏动态注入（去主题大车头版）
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
@@ -10,6 +10,14 @@
 
     // 🌌 3. 核武级地毯式暗黑 CSS
     const MYSTERIOUS_THEME_CSS = `
+        /* 💥 【核心新增】地毯式扫荡：强行抹除 GitHub 默认主题自带的巨型蓝色/绿色横幅、大标题和简介区域 */
+        .page-header, header, #header_wrap, .project-name, .project-tagline {
+            display: none !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
         html, body, 
         .wrapper, .container, .main-content, #content, 
         main, section, article, .markdown-body, .contact-container {
@@ -81,10 +89,10 @@
         else { document.addEventListener('DOMContentLoaded', () => document.head.appendChild(styleElement)); }
     }
 
-    // 🚀 5.【全新中心化组件逻辑】全自动注入网站共用的顶栏和底栏
+    // 🚀 5. 全自动注入网站共用的顶栏和底栏
     if (!isGame && !isLoginPage) {
         document.addEventListener('DOMContentLoaded', function() {
-            // A. 构建顶栏 HTML (全部升级为绝对路径前缀 '/')
+            // A. 构建顶栏 HTML
             const navbarContainer = document.createElement('div');
             navbarContainer.innerHTML = `
                 <div class="navbar">
@@ -98,7 +106,6 @@
                     <a href="/22.html">怪物鸡吧</a>
                 </div>
             `;
-            // 将顶栏强行塞到当前页面 <body> 的最前方
             document.body.insertBefore(navbarContainer, document.body.firstChild);
 
             // B. 构建底栏 HTML
@@ -109,7 +116,6 @@
                 <p><a href="/contact.html" style="color: #58a6ff;">联系我</a></p>
                 <p><a href="javascript:void(0);" onclick="sessionStorage.removeItem('site_auth_token'); window.location.reload();" style="color: #ff4d4f; font-weight: bold; text-decoration: none;">退出登录</a></p>
             `;
-            // 将底栏强行追加到当前页面 <body> 的最底部
             document.body.appendChild(footerElement);
         });
     }
