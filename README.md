@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- 🔑 引入全功能核心脚本 -->
-    <script src="/auth.js"></script>
+    <script src="/auth.js?v=1"></script>
     <title>川大附中 天堂网</title>
 </head>
 <body>
