@@ -1,4 +1,4 @@
-// auth.js - 全站一体化终极脚本：权限拦截 + 登录浮窗 + 暗黑主题 + 全局公用顶底栏动态注入（去主题大车头版）
+// auth.js - 精准手术版：权限拦截 + 登录浮窗 + 暗黑主题 + 顶底栏动态注入 + 绝不误伤自定义标题
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
@@ -10,12 +10,14 @@
 
     // 🌌 3. 核武级地毯式暗黑 CSS
     const MYSTERIOUS_THEME_CSS = `
-        /* 💥 【核心新增】地毯式扫荡：强行抹除 GitHub 默认主题自带的巨型蓝色/绿色横幅、大标题和简介区域 */
-        .page-header, header, #header_wrap, .project-name, .project-tagline {
+        /* 🎯 精准外科手术式隐藏：只针对 GitHub Pages 默认官方主题生成的顶部横幅组件，绝不误伤用户自定义的 header 或标题 */
+        .page-header, #header_wrap, .site-header, .project-name, .project-tagline, .downloads {
             display: none !important;
             height: 0 !important;
             padding: 0 !important;
             margin: 0 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
         }
 
         html, body, 
@@ -25,11 +27,14 @@
             color: #e2e0eb !important;
         }
         p, span, li, td, th, em, strong, label { color: #e2e0eb !important; }
+        
+        /* 🌟 确保用户自己写的所有 H1-H6 大标题完美显现并保持高亮 */
         h1, h2, h3, h4, h5, h6 {
             color: #ffffff !important;
             border-bottom: 1px solid #231c42 !important;
             padding-bottom: 8px;
         }
+        
         /* 顶栏公共样式美化 */
         body .navbar {
             background-color: #141126 !important;
@@ -89,10 +94,22 @@
         else { document.addEventListener('DOMContentLoaded', () => document.head.appendChild(styleElement)); }
     }
 
-    // 🚀 5. 全自动注入网站共用的顶栏和底栏
+    // 🚀 5. 全自动注入顶底栏 + 精准物理移除官方横幅
     if (!isGame && !isLoginPage) {
         document.addEventListener('DOMContentLoaded', function() {
-            // A. 构建顶栏 HTML
+            
+            // 🎯 只定向粉碎 GitHub 官方生成模板的类名，绝对不碰通用的 header 标签
+            const targetKillList = [
+                '.page-header', '#header_wrap', '.site-header', '.project-name', '.project-tagline'
+            ];
+            targetKillList.forEach(function(selector) {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(function(el) {
+                    if (el) el.remove();
+                });
+            });
+
+            // A. 构建新顶栏 HTML
             const navbarContainer = document.createElement('div');
             navbarContainer.innerHTML = `
                 <div class="navbar">
@@ -102,13 +119,14 @@
                 </div>
                 <div class="navbar">
                     <a href="/24.html">王茂纲</a>
+                    <a href="/24.html">王茂纲</a>
                     <a href="/25.html">异闻录</a>
                     <a href="/22.html">怪物鸡吧</a>
                 </div>
             `;
             document.body.insertBefore(navbarContainer, document.body.firstChild);
 
-            // B. 构建底栏 HTML
+            // B. 构建新底栏 HTML
             const footerElement = document.createElement('footer');
             footerElement.innerHTML = `
                 <p>© 2026 川大附中天堂网 </p>
