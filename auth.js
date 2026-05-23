@@ -1,71 +1,76 @@
-// auth.js - 全站一体化脚本：密码拦截 + 多账号匹配 + 登录浮窗 + 全局动态主题（绝对路径版）
+// auth.js - 终极无死角版：密码拦截 + 多账号匹配 + 登录浮窗 + 强力地毯式暗黑主题
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
     const VALID_USERNAMES = ["admin32", "admin33", "admin39"];
     const WELCOME_MAP = { "admin32": "欢迎fyh", "admin33": "欢迎hxb", "admin39": "欢迎lbr" };
 
-    // 🎮 2. 游戏排除列表：只要网址包含这些词，就绝对不加载暗黑主题（保持游戏原本色彩）
+    // 🎮 2. 游戏排除列表：只要网址包含这些词，就绝对不加载暗黑主题
     const EXCLUDED_GAMES = ["game.html", "tetris", "snake", "22.html"]; 
 
-    // 🌌 3. 内嵌全局暗黑主题 CSS（确保全站所有引入 auth.js 的页面都能直接变色，无需依赖外部 css）
+    // 🌌 3.【核心升级】核武级地毯式暗黑 CSS（专门对付 GitHub Pages 的各种主题大盒子）
     const MYSTERIOUS_THEME_CSS = `
-        body {
-            background-color: #0d0b18 !important; /* 深邃星空紫黑底色 */
-            color: #e2e0eb !important;           /* 柔和护眼的雾银文本色 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            line-height: 1.7;
+        /* 💥 第一步：强行把全站所有可能的基础大背景、容器、主区域全部刷成深空紫黑 */
+        html, body, 
+        .wrapper, .container, .main-content, #content, 
+        main, section, article, .markdown-body {
+            background-color: #0d0b18 !important;
+            color: #e2e0eb !important;
         }
-        /* 主标题与次标题 */
-        h1, h2, h3, h4 {
+
+        /* 💥 第二步：强制把所有文本相关的标签（段落、列表、表格等）统一为柔和雾银字 */
+        p, span, li, td, th, em, strong {
+            color: #e2e0eb !important;
+        }
+
+        /* 💥 第三步：将所有标题文字强行拉亮为纯白，并加上暗紫分界线 */
+        h1, h2, h3, h4, h5, h6 {
             color: #ffffff !important;
             border-bottom: 1px solid #231c42 !important;
             padding-bottom: 8px;
         }
-        /* 统一各页面的导航栏样式 */
-        .navbar {
+
+        /* 💥 第四步：精准保护导航栏！由于上面把 div 刷黑了，这里必须用更高的权重把导航栏救回来 */
+        body .navbar {
             background-color: #141126 !important;
             border-bottom: 1px solid #2a2254 !important;
             padding: 12px !important;
             border-radius: 8px;
             margin-bottom: 15px;
+            display: flex !important; /* 确保弹性布局不被冲垮 */
         }
-        .navbar a {
+        body .navbar a {
             color: #a29bfe !important; /* 荧光淡紫链接 */
             margin: 0 12px !important;
             text-decoration: none !important;
-            font-weight: bold;
-            transition: color 0.2s ease;
+            font-weight: bold !important;
         }
-        .navbar a:hover {
+        body .navbar a:hover {
             color: #2ed573 !important; /* 悬停时变为炫绿 */
         }
-        /* 统一网页内普通超链接颜色 */
-        a {
+
+        /* 💥 第五步：常规页面普通超链接颜色 */
+        body a {
             color: #58a6ff !important;
         }
-        /* 柔化页面内的图片，防止刺眼 */
+
+        /* 💥 第六步：图片加暗色阴影融化边缘 */
         img {
             border-radius: 8px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
             border: 1px solid #231c42;
-            max-width: 100%;
-            height: auto;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #231c42;
-            margin: 30px 0;
         }
     `;
 
-    // ⚡ 4. 自动化动态注入主题（走绝对路径判定，精准避开小游戏和登录页）
+    // ⚡ 4. 自动化动态注入主题（双重保障加载，防止部分页面 DOM 未就绪）
     const currentPath = window.location.pathname.toLowerCase();
     const isGame = EXCLUDED_GAMES.some(gameKeyword => currentPath.includes(gameKeyword.toLowerCase()));
     
     if (!isGame && !currentPath.endsWith('/login.html')) {
         const styleElement = document.createElement('style');
         styleElement.appendChild(document.createTextNode(MYSTERIOUS_THEME_CSS));
+        
+        // 只要 head 出来了立刻注入，没出来就等 DOMContentLoaded，确保万无一失
         if (document.head) {
             document.head.appendChild(styleElement);
         } else {
@@ -73,7 +78,7 @@
         }
     }
 
-    // 🎯 5. 判断当前是否在登录页（全升级为绝对路径匹配 `/login.html`）
+    // 🎯 5. 判断当前是否在登录页（绝对路径匹配）
     if (currentPath.endsWith('/login.html')) {
         document.addEventListener('DOMContentLoaded', function() {
             const loginBtn = document.getElementById('login-btn');
@@ -90,7 +95,6 @@
                         sessionStorage.setItem('site_auth_token', 'passed_successfully');
                         sessionStorage.setItem('site_welcome_msg', WELCOME_MAP[u]);
                         
-                        // 登录成功后，默认跳转回根目录首页
                         let redirectUrl = sessionStorage.getItem('auth_redirect_url') || '/index.html';
                         if (redirectUrl.endsWith('/login.html')) { redirectUrl = '/index.html'; }
                         
@@ -107,11 +111,11 @@
         return;
     }
 
-    // 🔒 6. 正常网页的拦截逻辑（绝对路径重定向）
+    // 🔒 6. 正常网页的拦截逻辑
     const isAuthed = sessionStorage.getItem('site_auth_token');
     if (isAuthed !== 'passed_successfully') {
         sessionStorage.setItem('auth_redirect_url', window.location.href);
-        window.location.href = '/login.html'; // 确保一脚踢回根目录的登录页
+        window.location.href = '/login.html'; 
         return;
     }
 
