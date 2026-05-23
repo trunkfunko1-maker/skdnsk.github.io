@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- 🔑 ?v=4 强行冲刷掉浏览器对主页的所有顽固缓存 -->
-    <script src="/auth.js?v=4"></script>
+    <script src="/auth.js?v=6"></script>
     <title>川大附中 天堂网</title>
         <!-- 🎯 隐形力场：直接在 md 头部拦截，瞬间让系统自带的蓝色/绿色大横幅人间蒸发，绝不误伤正文 -->
     <style>
