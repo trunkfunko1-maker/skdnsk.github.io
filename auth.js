@@ -1,25 +1,25 @@
-// auth.js - 终极无死角版：密码拦截 + 多账号匹配 + 登录浮窗 + 强力地毯式暗黑主题
+// auth.js - 终极无死角版：密码拦截 + 多账号匹配 + 登录浮窗 + 强力地毯式暗黑主题（修复22页面冲突）
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
     const VALID_USERNAMES = ["admin32", "admin33", "admin39"];
     const WELCOME_MAP = { "admin32": "欢迎fyh", "admin33": "欢迎hxb", "admin39": "欢迎lbr" };
 
-    // 🎮 2. 游戏排除列表：只要网址包含这些词，就绝对不加载暗黑主题
-    const EXCLUDED_GAMES = ["game.html", "tetris", "snake", "22.html"]; 
+    // 🎮 2. 游戏排除列表：【已移除 22.html】现在只有真正的游戏页面才不受主题影响
+    const EXCLUDED_GAMES = ["game.html", "tetris", "snake"]; 
 
-    // 🌌 3.【核心升级】核武级地毯式暗黑 CSS（专门对付 GitHub Pages 的各种主题大盒子）
+    // 🌌 3. 核武级地毯式暗黑 CSS
     const MYSTERIOUS_THEME_CSS = `
         /* 💥 第一步：强行把全站所有可能的基础大背景、容器、主区域全部刷成深空紫黑 */
         html, body, 
         .wrapper, .container, .main-content, #content, 
-        main, section, article, .markdown-body {
+        main, section, article, .markdown-body, .contact-container {
             background-color: #0d0b18 !important;
             color: #e2e0eb !important;
         }
 
-        /* 💥 第二步：强制把所有文本相关的标签（段落、列表、表格等）统一为柔和雾银字 */
-        p, span, li, td, th, em, strong {
+        /* 💥 第二步：强制把所有文本相关的标签统一为柔和雾银字 */
+        p, span, li, td, th, em, strong, label {
             color: #e2e0eb !important;
         }
 
@@ -30,23 +30,23 @@
             padding-bottom: 8px;
         }
 
-        /* 💥 第四步：精准保护导航栏！由于上面把 div 刷黑了，这里必须用更高的权重把导航栏救回来 */
+        /* 💥 第四步：精准保护并美化导航栏 */
         body .navbar {
             background-color: #141126 !important;
             border-bottom: 1px solid #2a2254 !important;
             padding: 12px !important;
             border-radius: 8px;
             margin-bottom: 15px;
-            display: flex !important; /* 确保弹性布局不被冲垮 */
+            display: flex !important;
         }
         body .navbar a {
-            color: #a29bfe !important; /* 荧光淡紫链接 */
+            color: #a29bfe !important;
             margin: 0 12px !important;
             text-decoration: none !important;
             font-weight: bold !important;
         }
         body .navbar a:hover {
-            color: #2ed573 !important; /* 悬停时变为炫绿 */
+            color: #2ed573 !important;
         }
 
         /* 💥 第五步：常规页面普通超链接颜色 */
@@ -60,17 +60,43 @@
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
             border: 1px solid #231c42;
         }
+
+        /* 💥 第七步：【全新新增】专门针对 contact 页面的表单输入框进行全透暗黑化 */
+        body input[type="text"], 
+        body input[type="password"], 
+        body textarea {
+            background-color: #141126 !important; /* 变成暗紫输入框 */
+            color: #ffffff !important;            /* 输入文字为纯白 */
+            border: 1px solid #3d346d !important; /* 暗紫色边框 */
+        }
+        body input:focus, body textarea:focus {
+            border-color: #a29bfe !important;     /* 聚焦时边框发光 */
+            outline: none;
+        }
+
+        /* 💥 第八步：【全新新增】将全站所有的普通按钮、提交按钮统一升级为炫绿科技感样式 */
+        body button, body input[type="submit"] {
+            background: linear-gradient(180deg, #2ed573 0%, #26af5f 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 25px !important;      /* 变成圆角高档按钮 */
+            font-weight: bold !important;
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3) !important;
+            cursor: pointer !important;
+            transition: transform 0.2s ease !important;
+        }
+        body button:hover {
+            transform: scale(1.03);             /* 悬停微动特效 */
+        }
     `;
 
-    // ⚡ 4. 自动化动态注入主题（双重保障加载，防止部分页面 DOM 未就绪）
+    // ⚡ 4. 自动化动态注入主题
     const currentPath = window.location.pathname.toLowerCase();
     const isGame = EXCLUDED_GAMES.some(gameKeyword => currentPath.includes(gameKeyword.toLowerCase()));
     
     if (!isGame && !currentPath.endsWith('/login.html')) {
         const styleElement = document.createElement('style');
         styleElement.appendChild(document.createTextNode(MYSTERIOUS_THEME_CSS));
-        
-        // 只要 head 出来了立刻注入，没出来就等 DOMContentLoaded，确保万无一失
         if (document.head) {
             document.head.appendChild(styleElement);
         } else {
@@ -78,7 +104,7 @@
         }
     }
 
-    // 🎯 5. 判断当前是否在登录页（绝对路径匹配）
+    // 🎯 5. 判断当前是否在登录页
     if (currentPath.endsWith('/login.html')) {
         document.addEventListener('DOMContentLoaded', function() {
             const loginBtn = document.getElementById('login-btn');
