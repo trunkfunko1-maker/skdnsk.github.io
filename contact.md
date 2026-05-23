@@ -4,7 +4,7 @@ title: 联系我
 ---
 
 <!-- 🔑 核心补充：引入全自动安全与暗黑主题脚本 -->
-<script src="/auth.js"></script>
+<script src="/auth.js?v=1"></script>
 
 # 联系我
 
