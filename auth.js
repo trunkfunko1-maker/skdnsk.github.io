@@ -1,11 +1,11 @@
-// auth.js - 终极无死角版：密码拦截 + 多账号匹配 + 登录浮窗 + 强力地毯式暗黑主题（修复22页面冲突）
+// auth.js - 全站一体化脚本：密码拦截 + 多账号匹配 + 登录浮窗(天蓝) + 全局动态主题(深蓝按钮版)
 (function() {
     // 🔒 1. 基础配置：密码、账号、欢迎词
     const CORRECT_PASSWORD = "323339";
     const VALID_USERNAMES = ["admin32", "admin33", "admin39"];
     const WELCOME_MAP = { "admin32": "欢迎fyh", "admin33": "欢迎hxb", "admin39": "欢迎lbr" };
 
-    // 🎮 2. 游戏排除列表：【已移除 22.html】现在只有真正的游戏页面才不受主题影响
+    // 🎮 2. 游戏排除列表：只要网址包含这些词，就绝对不加载任何样式（game.html 完美安全）
     const EXCLUDED_GAMES = ["game.html", "tetris", "snake"]; 
 
     // 🌌 3. 核武级地毯式暗黑 CSS
@@ -46,7 +46,7 @@
             font-weight: bold !important;
         }
         body .navbar a:hover {
-            color: #2ed573 !important;
+            color: #54a0ff !important; /* 🌠 配合深蓝主题，悬停文字变为清爽亮蓝 */
         }
 
         /* 💥 第五步：常规页面普通超链接颜色 */
@@ -61,32 +61,32 @@
             border: 1px solid #231c42;
         }
 
-        /* 💥 第七步：【全新新增】专门针对 contact 页面的表单输入框进行全透暗黑化 */
+        /* 💥 第七步：专门针对 contact 页面的表单输入框进行全透暗黑化 */
         body input[type="text"], 
         body input[type="password"], 
         body textarea {
-            background-color: #141126 !important; /* 变成暗紫输入框 */
-            color: #ffffff !important;            /* 输入文字为纯白 */
-            border: 1px solid #3d346d !important; /* 暗紫色边框 */
+            background-color: #141126 !important;
+            color: #ffffff !important;
+            border: 1px solid #3d346d !important;
         }
         body input:focus, body textarea:focus {
-            border-color: #a29bfe !important;     /* 聚焦时边框发光 */
+            border-color: #a29bfe !important;
             outline: none;
         }
 
-        /* 💥 第八步：【全新新增】将全站所有的普通按钮、提交按钮统一升级为炫绿科技感样式 */
+        /* 💥 第八步：【核心修改】将全站绿色按钮全部降维打击，升级为高档深蓝色渐变 */
         body button, body input[type="submit"] {
-            background: linear-gradient(180deg, #2ed573 0%, #26af5f 100%) !important;
+            background: linear-gradient(180deg, #3742fa 0%, #1e3799 100%) !important; /* 🔵 炫酷深蓝渐变 */
             color: white !important;
             border: none !important;
-            border-radius: 25px !important;      /* 变成圆角高档按钮 */
+            border-radius: 25px !important;
             font-weight: bold !important;
-            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3) !important;
+            box-shadow: 0 4px 15px rgba(30, 55, 153, 0.4) !important; /* 🔵 蓝色光晕外阴影 */
             cursor: pointer !important;
             transition: transform 0.2s ease !important;
         }
         body button:hover {
-            transform: scale(1.03);             /* 悬停微动特效 */
+            transform: scale(1.03);
         }
     `;
 
@@ -145,7 +145,7 @@
         return;
     }
 
-    // 🌟 7. 全站通用的欢迎浮窗生成逻辑
+    // 🌟 7.【核心修改】全站通用的欢迎浮窗生成逻辑（已切换为天蓝色背景）
     const welcomeMsg = sessionStorage.getItem('site_welcome_msg');
     if (welcomeMsg) {
         sessionStorage.removeItem('site_welcome_msg');
@@ -154,9 +154,10 @@
             toast.innerText = welcomeMsg;
             toast.style.cssText = `
                 position: fixed; top: 15%; left: 50%; transform: translate(-50%, -50%);
-                background: rgba(46, 213, 115, 0.95); color: white; padding: 14px 40px;
+                background: rgba(0, 168, 255, 0.95); /* ❄️ 完美天蓝色背景 */
+                color: white; padding: 14px 40px;
                 border-radius: 30px; font-weight: bold; font-size: 18px; font-family: sans-serif;
-                box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4); z-index: 999999; opacity: 1;
+                box-shadow: 0 5px 25px rgba(0, 168, 255, 0.3); z-index: 999999; opacity: 1;
                 transition: opacity 0.5s ease, transform 0.5s ease;
             `;
             document.body.appendChild(toast);
