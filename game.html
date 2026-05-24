@@ -240,19 +240,18 @@
             box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
         }
 
-        /* 📱 手机端专用悬浮操作盘 */
+        /* 📱 手机端专用外置独立操作盘 */
         #mobile-controller {
-            position: absolute;
-            bottom: 30px;
-            left: 0;
             width: 100%;
-            padding: 0 25px;
+            padding: 15px 25px;
+            background: #141124; /* 独立的复古外置暗色操纵台底座 */
+            border-top: 3px solid #231c3d;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            pointer-events: none; 
             z-index: 8;
-            transition: opacity 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
         }
         #wrapper.pc-mode #mobile-controller {
             display: none !important;
@@ -260,46 +259,44 @@
 
         .dpad-horizontal {
             display: flex;
-            gap: 12px;
-            pointer-events: auto;
+            gap: 15px;
         }
         .ctrl-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            font-size: 24px;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            font-size: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             touch-action: none;
         }
         .ctrl-btn:active {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.35);
             color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         /* 开火键区 */
-        .fire-sector {
-            pointer-events: auto;
-        }
         #btn-fire {
-            width: 80px;
-            height: 80px;
+            width: 82px;
+            height: 82px;
             border-radius: 50%;
-            background: rgba(255, 71, 87, 0.6);
+            background: linear-gradient(180deg, #ff5252 0%, #ff3333 100%);
             color: white;
-            font-size: 30px;
-            border: 2px solid rgba(255, 71, 87, 0.8);
-            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            font-size: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 18px rgba(255, 51, 51, 0.45);
         }
         #btn-fire:active {
-            background: rgba(255, 71, 87, 0.9);
-            transform: scale(0.95);
+            background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
+            transform: scale(0.93);
+            box-shadow: 0 2px 8px rgba(255, 51, 51, 0.6);
         }
 
         .overlay-footer {
@@ -391,7 +388,7 @@
             wrapper.classList.remove('pc-mode');
             btnMobile.classList.add('active');
             btnPC.classList.remove('active');
-            descText.innerHTML = "使用屏幕底部左右方向键控制机体<br>右下角红按钮开火！";
+            descText.innerHTML = "使用下方的独立操纵盘左右键移动<br>红颜色按钮全力开火！";
             player.size = 40;
             player.speed = 6;
         }
@@ -423,7 +420,7 @@
     let specialSpawnSeconds = [];
     let bombSpawnSeconds = []; 
 
-    // 🎇 炸弹火星粒子效果系统
+    // 🎇 爆炸粒子高级特效系统
     let bombExplosionParticles = [];
     let isBombExploding = false;
     let bombExplosionTimer = 0;
@@ -496,24 +493,45 @@
         ctx.restore();
     }
 
-    function createBombExplosion(x, y) {
+    // 💥 触发全屏双重大爆炸：炸弹轰鸣 + 战机碎裂
+    function createBombExplosion(bx, by) {
         bombExplosionParticles = [];
         isBombExploding = true;
-        bombExplosionTimer = 55; 
-        
+        bombExplosionTimer = 65; // 延长爆破定格时间，尽显火光四射
+
+        // 1. 炸弹处的火光喷涌效果 (炽烈红橙黄三色)
         for (let i = 0; i < 90; i++) {
             let angle = Math.random() * Math.PI * 2;
-            let speed = 3 + Math.random() * 12; 
-            
+            let speed = 4 + Math.random() * 16; 
             bombExplosionParticles.push({
-                x: x,
-                y: y,
+                x: bx,
+                y: by,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                gravity: 0.05 + Math.random() * 0.1, 
-                colorSeed: Math.random(),
-                size: 2 + Math.random() * 3.5, 
-                alpha: 1
+                gravity: 0.04 + Math.random() * 0.08, 
+                size: 3 + Math.random() * 5, 
+                alpha: 1,
+                decay: 0.012 + Math.random() * 0.01,
+                styleGroup: 'fire'
+            });
+        }
+
+        // 2. 玩家飞机同步诱发剧烈爆炸 (飞姬解体：核心耀白闪光 + 机体结构原色残渣 + 金色火星)
+        let px = player.x + player.size / 2;
+        let py = player.y + player.size / 2;
+        for (let i = 0; i < 95; i++) {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = 5 + Math.random() * 14;
+            bombExplosionParticles.push({
+                x: px,
+                y: py,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                gravity: 0.05 + Math.random() * 0.06,
+                size: 2.5 + Math.random() * 4.5,
+                alpha: 1,
+                decay: 0.014 + Math.random() * 0.012,
+                styleGroup: Math.random() > 0.4 ? 'spark' : 'plasma' // 分离电磁火花与残骸
             });
         }
     }
@@ -631,8 +649,10 @@
     function drawStaticScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 1. 绘制战机
-        drawFighter(player.x, player.y, player.size);
+        // 1. 绘制战机（大爆炸期间飞机消失解体，不重复绘制完好机身）
+        if (!isBombExploding) {
+            drawFighter(player.x, player.y, player.size);
+        }
         
         // 2. 绘制子弹
         for (let b of bullets) {
@@ -664,7 +684,7 @@
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 炸弹爆炸定格逻辑
+        // 💥 炸弹震撼爆炸定格逻辑与炫目粒子渲染
         if (isBombExploding) {
             drawStaticScene();
 
@@ -673,22 +693,38 @@
                 p.x += p.vx;
                 p.y += p.vy;
                 p.vy += p.gravity; 
-                p.vx *= 0.94;      
-                p.vy *= 0.94;
-                p.size *= 0.96;    
-                p.alpha -= 0.015;
+                p.vx *= 0.95;      
+                p.vy *= 0.95;
+                p.size *= 0.97;    
+                p.alpha -= p.decay;
 
                 if (p.size <= 0.2 || p.alpha <= 0) {
                     bombExplosionParticles.splice(i, 1);
                     continue;
                 }
                 
-                let r = 255;
-                let g = Math.floor(220 * (p.alpha) * (p.colorSeed > 0.3 ? 1 : 0.4));
-                let b = Math.floor(50 * (p.alpha * p.alpha));
+                let r, g, b;
+                if (p.styleGroup === 'fire') {
+                    // 烈焰效果：由白黄转橙红
+                    r = 255;
+                    g = Math.floor(210 * p.alpha);
+                    b = Math.floor(55 * p.alpha * p.alpha);
+                } else if (p.styleGroup === 'spark') {
+                    // 极亮电荷火星：核心高明度耀金白
+                    r = 255;
+                    g = Math.floor(235 * (p.alpha * 0.4 + 0.6));
+                    b = Math.floor(130 + 125 * p.alpha);
+                } else {
+                    // 战机机身原色碎渣（结合附中原色翠绿调：#2ed573）
+                    r = Math.floor(45 * p.alpha);
+                    g = Math.floor(213 + 42 * p.alpha);
+                    b = Math.floor(115 * p.alpha);
+                }
                 
                 ctx.save();
                 ctx.globalAlpha = p.alpha;
+                // 添加发光混合模式让火光四射更耀眼
+                ctx.globalCompositeOperation = 'screen';
                 ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -857,11 +893,11 @@
 
         if (reason === 'bomb') {
             titleElement.classList.add('bomb-title'); 
-            titleElement.innerHTML = "炸弹爆炸<br>游戏结束！";
-            descElement.innerHTML = `你误击了高危炸弹肛毛！<br>肛毛已将你瞬间湮灭！`;
+            titleElement.innerHTML = "炸弹爆炸<br>全军覆没！";
+            descElement.innerHTML = `你误击了高危炸弹肛毛！<br>剧烈连锁爆炸已将你连同战机彻底湮灭！`;
         } else if (reason === 'hit') {
             titleElement.innerHTML = "战机坠毁<br>游戏结束！";
-            descElement.innerHTML = `很遗憾，你被肛毛击中了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
+            descElement.innerHTML = `很遗憾，你被肛毛撞击坠毁了！💤<br><br>最终斩获积分：<span style="color:#fff200; font-weight:bold;">${score}</span> 分`;
         } else {
             titleElement.classList.add('success-title'); 
             titleElement.innerHTML = "时间到<br>完美生还！";
