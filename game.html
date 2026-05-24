@@ -10,9 +10,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none; /* 禁用 iOS 和部分安卓浏览器长按弹出菜单/放大镜 */
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important; /* 彻底禁用全局长按弹出菜单 */
             touch-action: none; /* 禁用系统默认缩放和双击 */
         }
         body {
@@ -23,7 +23,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            min-height: 100dvh; /* 适配移动端动态视口 */
+            min-height: 100dvh; 
             overflow: hidden;
         }
 
@@ -33,7 +33,7 @@
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            height: 100dvh; /* 撑满动态屏幕 */
+            height: 100dvh; 
             background: #000;
             display: flex;
             flex-direction: column;
@@ -52,10 +52,10 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(91, 77, 163, 0.2);
         }
 
-        /* 顶栏 */
+        /* 顶栏：🛠️ 修正拼写，恢复靠右对齐 */
         #status-bar {
             display: flex;
-            justify-space-between;
+            justify-content: space-between; /* 修复拼写错误，实现左标题右数据 */
             align-items: center;
             padding: 12px 15px;
             background: #1e1e1e;
@@ -175,7 +175,6 @@
             width: 100%;
         }
 
-        /* 大标题基础样式 */
         .overlay h2 { 
             margin-bottom: 15px; 
             font-size: 28px; 
@@ -183,14 +182,12 @@
             line-height: 1.4; 
         }
         
-        /* 通关成功专属样式 */
         .overlay h2.success-title {
             color: #2ed573;
             text-shadow: 0 0 15px rgba(46, 213, 115, 0.6), 0 0 30px rgba(46, 213, 115, 0.2);
             font-weight: 900;
         }
 
-        /* 💣 炸弹爆炸专属强光加亮样式 */
         .overlay h2.bomb-title {
             color: #ff3838;
             text-shadow: 0 0 20px rgba(255, 56, 56, 0.9), 0 0 40px rgba(255, 56, 56, 0.5);
@@ -204,7 +201,6 @@
 
         .overlay p { margin-bottom: 20px; font-size: 14px; color: #ccc; line-height: 1.6; }
 
-        /* 选项按钮行 */
         .mode-selector {
             display: flex;
             gap: 15px;
@@ -228,7 +224,6 @@
             box-shadow: 0 0 12px rgba(255, 71, 87, 0.5);
         }
 
-        /* 主按钮 */
         .main-btn {
             padding: 12px 45px;
             font-size: 18px;
@@ -241,13 +236,13 @@
             box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
         }
 
-        /* 📱 手机端专用外置独立操作盘 */
+        /* 📱 手机端独立操作盘（保持紧凑压缩状态） */
         #mobile-controller {
             width: 100%;
-            padding: 8px 20px; /* 🔥 压缩压缩：上下内边距由 15px 缩减至 8px，极大限度留出战场空间 */
+            padding: 8px 20px; 
             background: #141124; 
             border-top: 3px solid #231c3d;
-            display: none; /* 🔥 初始隐藏：不在初始和结算界面抢占视觉，仅在战斗打响时用 JS 呼出 */
+            display: none; /* 初始隐藏，由JS动态控制 */
             justify-content: space-between;
             align-items: center;
             z-index: 8;
@@ -260,22 +255,23 @@
 
         .dpad-horizontal {
             display: flex;
-            gap: 10px; /* 🔥 按钮横向间距由 15px 压缩至 10px */
+            gap: 10px; 
         }
         .ctrl-btn {
             background: rgba(255, 255, 255, 0.12);
             color: rgba(255, 255, 255, 0.85);
             border: 2px solid rgba(255, 255, 255, 0.18);
             border-radius: 12px;
-            font-size: 22px; /* 🔥 字体图标微调缩小 */
+            font-size: 22px; 
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            width: 62px;  /* 🔥 按钮宽度由 70px 压缩至 62px */
-            height: 62px; /* 🔥 按钮高度由 70px 压缩至 62px */
+            width: 62px;  
+            height: 62px; 
             touch-action: none;
+            -webkit-touch-callout: none !important;
         }
         .ctrl-btn:active {
             background: rgba(255, 255, 255, 0.35);
@@ -283,14 +279,13 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* 开火键区 */
         #btn-fire {
-            width: 74px;  /* 🔥 开火键由 82px 紧凑收缩至 74px */
-            height: 74px; /* 🔥 开火键由 82px 紧凑收缩至 74px */
+            width: 74px;  
+            height: 74px; 
             border-radius: 50%;
             background: linear-gradient(180deg, #ff5252 0%, #ff3333 100%);
             color: white;
-            font-size: 28px; /* 🔥 图标大小按比例略微缩减 */
+            font-size: 28px; 
             border: 3px solid rgba(255, 255, 255, 0.25);
             box-shadow: 0 5px 15px rgba(255, 51, 51, 0.45);
         }
@@ -421,7 +416,6 @@
     let specialSpawnSeconds = [];
     let bombSpawnSeconds = []; 
 
-    // 🎇 爆炸粒子高级特效系统
     let bombExplosionParticles = [];
     let isBombExploding = false;
     let bombExplosionTimer = 0;
@@ -494,13 +488,11 @@
         ctx.restore();
     }
 
-    // 💥 触发全屏双重大爆炸：炸弹轰鸣 + 战机碎裂
     function createBombExplosion(bx, by) {
         bombExplosionParticles = [];
         isBombExploding = true;
         bombExplosionTimer = 65; 
 
-        // 1. 炸弹处的火光喷涌效果
         for (let i = 0; i < 90; i++) {
             let angle = Math.random() * Math.PI * 2;
             let speed = 4 + Math.random() * 16; 
@@ -517,7 +509,6 @@
             });
         }
 
-        // 2. 玩家飞机同步诱发剧烈爆炸
         let px = player.x + player.size / 2;
         let py = player.y + player.size / 2;
         for (let i = 0; i < 95; i++) {
@@ -553,36 +544,36 @@
         if(e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
     });
 
-    let activePointers = {}; 
-
+    // 🛠️ 核心进化：改用底层 touch 事件 + preventDefault 降维打击，彻底封死高版本手机放大镜/气泡
     function setupSafeControl(btnId, direction) {
         const btn = document.getElementById(btnId);
         
-        btn.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        btn.addEventListener('contextmenu', e => e.preventDefault());
 
-        btn.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 极其关键：切断原生系统的一切长按手势、气泡菜单、放大镜触发
             if(!isPlaying || isBombExploding) return;
             if (direction === 'fire') {
                 fireBullet();
             } else {
-                activePointers[e.pointerId] = direction;
                 keys[direction] = true;
-                btn.setPointerCapture(e.pointerId); 
             }
-        });
-    }
+        }, { passive: false });
 
-    window.addEventListener('pointerup', (e) => {
-        const boundDirection = activePointers[e.pointerId];
-        if (boundDirection) { keys[boundDirection] = false; delete activePointers[e.pointerId]; }
-    });
-    window.addEventListener('pointercancel', (e) => {
-        const boundDirection = activePointers[e.pointerId];
-        if (boundDirection) { keys[boundDirection] = false; delete activePointers[e.pointerId]; }
-    });
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (direction !== 'fire') {
+                keys[direction] = false;
+            }
+        }, { passive: false });
+
+        btn.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            if (direction !== 'fire') {
+                keys[direction] = false;
+            }
+        }, { passive: false });
+    }
 
     setupSafeControl('btn-left', 'left');
     setupSafeControl('btn-right', 'right');
@@ -824,7 +815,6 @@
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('special-popup').style.display = 'none';
         
-        // 🔥 关键调整：只有手机模式并且开始游戏时，才让外置操作盘浮现
         if (currentDeviceMode === 'mobile') {
             document.getElementById('mobile-controller').style.display = 'flex';
         } else {
@@ -880,11 +870,9 @@
         if(popupTimer) clearTimeout(popupTimer);
         document.getElementById('special-popup').style.display = 'none';
         
-        // 🔥 关键调整：游戏一结束，立刻将底部操作盘全面隐藏，退回背景
         document.getElementById('mobile-controller').style.display = 'none';
 
         keys.left = false; keys.right = false; keys.up = false; keys.down = false;
-        activePointers = {};
 
         const titleElement = document.getElementById('overlay-title');
         const descElement = document.getElementById('overlay-desc');
