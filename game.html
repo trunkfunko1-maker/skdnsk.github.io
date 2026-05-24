@@ -12,6 +12,7 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none; /* 禁用 iOS 和部分安卓浏览器长按弹出菜单/放大镜 */
             touch-action: none; /* 禁用系统默认缩放和双击 */
         }
         body {
@@ -54,7 +55,7 @@
         /* 顶栏 */
         #status-bar {
             display: flex;
-            justify-content: space-between;
+            justify-space-between;
             align-items: center;
             padding: 12px 15px;
             background: #1e1e1e;
@@ -243,10 +244,10 @@
         /* 📱 手机端专用外置独立操作盘 */
         #mobile-controller {
             width: 100%;
-            padding: 15px 25px;
-            background: #141124; /* 独立的复古外置暗色操纵台底座 */
+            padding: 8px 20px; /* 🔥 压缩压缩：上下内边距由 15px 缩减至 8px，极大限度留出战场空间 */
+            background: #141124; 
             border-top: 3px solid #231c3d;
-            display: flex;
+            display: none; /* 🔥 初始隐藏：不在初始和结算界面抢占视觉，仅在战斗打响时用 JS 呼出 */
             justify-content: space-between;
             align-items: center;
             z-index: 8;
@@ -259,21 +260,21 @@
 
         .dpad-horizontal {
             display: flex;
-            gap: 15px;
+            gap: 10px; /* 🔥 按钮横向间距由 15px 压缩至 10px */
         }
         .ctrl-btn {
             background: rgba(255, 255, 255, 0.12);
             color: rgba(255, 255, 255, 0.85);
             border: 2px solid rgba(255, 255, 255, 0.18);
-            border-radius: 14px;
-            font-size: 26px;
+            border-radius: 12px;
+            font-size: 22px; /* 🔥 字体图标微调缩小 */
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            width: 70px;
-            height: 70px;
+            width: 62px;  /* 🔥 按钮宽度由 70px 压缩至 62px */
+            height: 62px; /* 🔥 按钮高度由 70px 压缩至 62px */
             touch-action: none;
         }
         .ctrl-btn:active {
@@ -284,14 +285,14 @@
 
         /* 开火键区 */
         #btn-fire {
-            width: 82px;
-            height: 82px;
+            width: 74px;  /* 🔥 开火键由 82px 紧凑收缩至 74px */
+            height: 74px; /* 🔥 开火键由 82px 紧凑收缩至 74px */
             border-radius: 50%;
             background: linear-gradient(180deg, #ff5252 0%, #ff3333 100%);
             color: white;
-            font-size: 32px;
+            font-size: 28px; /* 🔥 图标大小按比例略微缩减 */
             border: 3px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 6px 18px rgba(255, 51, 51, 0.45);
+            box-shadow: 0 5px 15px rgba(255, 51, 51, 0.45);
         }
         #btn-fire:active {
             background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
@@ -497,9 +498,9 @@
     function createBombExplosion(bx, by) {
         bombExplosionParticles = [];
         isBombExploding = true;
-        bombExplosionTimer = 65; // 延长爆破定格时间，尽显火光四射
+        bombExplosionTimer = 65; 
 
-        // 1. 炸弹处的火光喷涌效果 (炽烈红橙黄三色)
+        // 1. 炸弹处的火光喷涌效果
         for (let i = 0; i < 90; i++) {
             let angle = Math.random() * Math.PI * 2;
             let speed = 4 + Math.random() * 16; 
@@ -516,7 +517,7 @@
             });
         }
 
-        // 2. 玩家飞机同步诱发剧烈爆炸 (飞姬解体：核心耀白闪光 + 机体结构原色残渣 + 金色火星)
+        // 2. 玩家飞机同步诱发剧烈爆炸
         let px = player.x + player.size / 2;
         let py = player.y + player.size / 2;
         for (let i = 0; i < 95; i++) {
@@ -531,7 +532,7 @@
                 size: 2.5 + Math.random() * 4.5,
                 alpha: 1,
                 decay: 0.014 + Math.random() * 0.012,
-                styleGroup: Math.random() > 0.4 ? 'spark' : 'plasma' // 分离电磁火花与残骸
+                styleGroup: Math.random() > 0.4 ? 'spark' : 'plasma' 
             });
         }
     }
@@ -556,6 +557,11 @@
 
     function setupSafeControl(btnId, direction) {
         const btn = document.getElementById(btnId);
+        
+        btn.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
         btn.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if(!isPlaying || isBombExploding) return;
@@ -649,18 +655,15 @@
     function drawStaticScene() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // 1. 绘制战机（大爆炸期间飞机消失解体，不重复绘制完好机身）
         if (!isBombExploding) {
             drawFighter(player.x, player.y, player.size);
         }
         
-        // 2. 绘制子弹
         for (let b of bullets) {
             ctx.fillStyle = '#fff200';
             ctx.fillRect(b.x, b.y, b.width, b.height);
         }
         
-        // 3. 绘制所有敌机
         for (let enemy of enemies) {
             if (enemy.status === 'alive') {
                 if (enemy.isBomb) {
@@ -684,7 +687,6 @@
     function gameLoop() {
         if(!isPlaying) return;
 
-        // 💥 炸弹震撼爆炸定格逻辑与炫目粒子渲染
         if (isBombExploding) {
             drawStaticScene();
 
@@ -705,17 +707,14 @@
                 
                 let r, g, b;
                 if (p.styleGroup === 'fire') {
-                    // 烈焰效果：由白黄转橙红
                     r = 255;
                     g = Math.floor(210 * p.alpha);
                     b = Math.floor(55 * p.alpha * p.alpha);
                 } else if (p.styleGroup === 'spark') {
-                    // 极亮电荷火星：核心高明度耀金白
                     r = 255;
                     g = Math.floor(235 * (p.alpha * 0.4 + 0.6));
                     b = Math.floor(130 + 125 * p.alpha);
                 } else {
-                    // 战机机身原色碎渣（结合附中原色翠绿调：#2ed573）
                     r = Math.floor(45 * p.alpha);
                     g = Math.floor(213 + 42 * p.alpha);
                     b = Math.floor(115 * p.alpha);
@@ -723,7 +722,6 @@
                 
                 ctx.save();
                 ctx.globalAlpha = p.alpha;
-                // 添加发光混合模式让火光四射更耀眼
                 ctx.globalCompositeOperation = 'screen';
                 ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
                 ctx.beginPath();
@@ -742,7 +740,6 @@
             return;
         }
 
-        // 常规更新
         if (keys.up && player.y > 0) player.y -= player.speed;
         if (keys.down && player.y < canvas.height - player.size) player.y += player.speed;
         if (keys.left && player.x > 0) player.x -= player.speed;
@@ -767,7 +764,6 @@
                     continue;
                 }
 
-                // 碰撞检测
                 if (player.x < enemy.x + enemy.size &&
                     player.x + player.size > enemy.x &&
                     player.y < enemy.y + enemy.size &&
@@ -782,7 +778,6 @@
                     return; 
                 }
 
-                // 子弹击中
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let bullet = bullets[j];
                     if (bullet.x < enemy.x + enemy.size &&
@@ -799,7 +794,6 @@
                             return; 
                         }
                         
-                        // 触发击中状态
                         enemy.status = 'hit';
                         enemy.hitTimer = 0;
                         
@@ -814,12 +808,8 @@
                     }
                 }
             } else if (enemy.status === 'hit') {
-                // 原地静止并累加帧数
                 enemy.hitTimer++;
-                
-                // 💡 针对不同类型的敌机区分停留判定帧数
-                let maxFreezeFrames = enemy.isSpecial ? 18 : 6; // 特殊Boss保持18帧(0.3秒)，普通敌机改为6帧(0.1秒)
-                
+                let maxFreezeFrames = enemy.isSpecial ? 18 : 6; 
                 if (enemy.hitTimer >= maxFreezeFrames) { 
                     enemies.splice(i, 1); 
                 }
@@ -833,6 +823,14 @@
     function startGame() {
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('special-popup').style.display = 'none';
+        
+        // 🔥 关键调整：只有手机模式并且开始游戏时，才让外置操作盘浮现
+        if (currentDeviceMode === 'mobile') {
+            document.getElementById('mobile-controller').style.display = 'flex';
+        } else {
+            document.getElementById('mobile-controller').style.display = 'none';
+        }
+
         resizeCanvas();
         
         score = 0;
@@ -882,6 +880,9 @@
         if(popupTimer) clearTimeout(popupTimer);
         document.getElementById('special-popup').style.display = 'none';
         
+        // 🔥 关键调整：游戏一结束，立刻将底部操作盘全面隐藏，退回背景
+        document.getElementById('mobile-controller').style.display = 'none';
+
         keys.left = false; keys.right = false; keys.up = false; keys.down = false;
         activePointers = {};
 
@@ -906,6 +907,7 @@
         
         document.getElementById('start-btn').innerText = "再次挑战";
         document.getElementById('overlay').style.display = 'flex';
+        setTimeout(resizeCanvas, 50); 
     }
 
     switchMode('mobile');
