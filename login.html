@@ -9,14 +9,17 @@
         body { background: #0f0c20; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-box { background: #15102a; padding: 30px; border-radius: 12px; border: 1px solid #3d346d; text-align: center; width: 90%; max-width: 360px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
         
-        /* 🔵 调整标题文本：改为蓝色高亮，并优化手机端字号与行高 */
+        /* 🔵 核心高亮：极客蓝荧光高亮特效 */
         h2 { 
             margin-bottom: 25px; 
-            color: #384cff; /* 蓝色高亮 */
-            font-size: 22px; /* 适中的基础字号 */
-            line-height: 1.4; /* 确保折行时美观 */
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(56, 76, 255, 0.3); /* 淡淡的蓝色霓虹氛围感 */
+            color: #00d2ff; /* 选用更亮、饱和度更高的荧光青蓝，确保在暗色背景下强力吸睛 */
+            font-size: 23px; /* 完美适配手机端的黄金字号 */
+            line-height: 1.4; /* 确保两行文本折行时不会挤压 */
+            font-weight: 900; /* 加粗字体增强视觉分量 */
+            letter-spacing: 1px; /* 略微加宽字距，提升高级感 */
+            /* 🔴 核心高亮特效：双层立体外发光阴影 */
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5), 
+                         0 0 25px rgba(0, 210, 255, 0.2); 
         }
         
         input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #3d346d; background: #0f0c20; color: white; box-sizing: border-box; }
@@ -24,10 +27,11 @@
         button:hover { background: #26af5f; }
         #error-msg { color: #ff3838; margin-top: 10px; font-size: 14px; }
 
-        /* 📱 针对超小屏幕手机的微调弹性机制 */
+        /* 📱 针对超窄屏幕手机浏览器的弹性降级机制，防止字体溢出 */
         @media (max-width: 340px) {
             h2 {
                 font-size: 19px; 
+                text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
             }
         }
     </style>
