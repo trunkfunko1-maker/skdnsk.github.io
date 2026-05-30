@@ -4,23 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身份验证</title>
-    <!-- 🔑 引入全自动安全脚本（注意加了斜杠，走绝对路径） -->
     <script src="/auth.js"></script>
     <style>
         body { background: #0f0c20; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-box { background: #15102a; padding: 30px; border-radius: 12px; border: 1px solid #3d346d; text-align: center; width: 90%; max-width: 360px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
-        h2 { margin-bottom: 20px; color: #ff4757; }
+        
+        /* 🔵 调整标题文本：改为蓝色高亮，并优化手机端字号与行高 */
+        h2 { 
+            margin-bottom: 25px; 
+            color: #384cff; /* 蓝色高亮 */
+            font-size: 22px; /* 适中的基础字号 */
+            line-height: 1.4; /* 确保折行时美观 */
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(56, 76, 255, 0.3); /* 淡淡的蓝色霓虹氛围感 */
+        }
+        
         input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #3d346d; background: #0f0c20; color: white; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background: #2ed573; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         button:hover { background: #26af5f; }
         #error-msg { color: #ff3838; margin-top: 10px; font-size: 14px; }
+
+        /* 📱 针对超小屏幕手机的微调弹性机制 */
+        @media (max-width: 340px) {
+            h2 {
+                font-size: 19px; 
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="login-box">
-        <h2>请输入访问凭证</h2>
-        <!-- 💡 注意：这里的 id 必须和 auth.js 里的对应 -->
+        <h2>欢迎访问<br>川大附中天堂网！</h2>
         <input type="text" id="username" placeholder="请输入账号">
         <input type="password" id="password" placeholder="请输入密码">
         <button id="login-btn">确认登录</button>
