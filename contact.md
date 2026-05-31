@@ -21,7 +21,8 @@ title: 联系我
 
 <div style="margin-bottom: 15px;">
 <label>留言内容:</label><br>
-<textarea name="message" required style="width: 100%; height: 150px; padding: 10px; margin-top: 5px; border-radius: 4px;"></textarea>
+<!-- 🔒 已加入 resize: none; 彻底锁死右下角拖拽功能，防止排版变形 -->
+<textarea name="message" required style="width: 100%; height: 150px; padding: 10px; margin-top: 5px; border-radius: 4px; resize: none;"></textarea>
 </div>
 
 <!-- 这里的按钮样式已被 auth.js 自动接管，变为精美的炫绿圆角按钮 -->
